@@ -1,3 +1,4 @@
 # Ambiente Virtual
 venv/
 .venv/
+Oscars.db

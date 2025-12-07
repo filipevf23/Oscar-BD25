@@ -1,5 +1,5 @@
 import sqlite3
-
+#Para criar a BD, se ela já existir não usar.
 conn = sqlite3.connect("Oscar-BD25\Oscars.db")
 cur = conn.cursor()
 
