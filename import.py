@@ -115,6 +115,17 @@ for _,row in df_nomeacao.iterrows():
         VALUES (?,?,?,?,?,?,?,?,?,?)
     """,(id,categoria_ano_id,cerimonia_id,filme,nome,winner,note,detail,citation,mf))
 
+#Concorre
+for _,row in df_nomeacao.iterrows():
+    nomeado_id = str(row['NomineeIds'])
+    nomeacao_id = str(row['NomId'])
+
+    cur.execute("""
+        INSERT OR IGNORE INTO concorre(nomeado_id,nomeacao_id)
+        VALUES (?,?)
+        """,(nomeado_id,nomeacao_id)) 
+
+
 # Salva alterações e fecha
 conn.commit()
 conn.close()
