@@ -57,10 +57,13 @@ for _, row in df_filme.iterrows():
     """, (id,nome,))  
 
 #Nomeado  -> Cada nomeado vai ter seu id próprio, talvez dividir melhor com base nisso?
-df_nomeado = df[['NomineeIds','Nominees']]
-
-for _,row in df_nomeado.iterrows():
-    id = str(row['NomineeIds'])
+for _,row in df.iterrows():
+    if pd.isna(row['Nominees']) and pd.isna(row['NomineeIds']):
+        continue
+    elif pd.isna(row['NomineeIds']):
+        id = f"AUTO_{row['Ceremony']}_{row['Category']}_{_}"
+    else:
+        id = str(row['NomineeIds'])
     nome = str(row['Nominees'])
     cur.execute("""
         INSERT OR IGNORE INTO nomeado (nomeado_id,nome)
@@ -88,9 +91,11 @@ for _,row in df_catAno.iterrows():
         """,(categoria,categoria_id,cerimonia_id))    
 
 #Nomeação 
-df_nomeacao = df
-for _,row in df_nomeacao.iterrows():
-    id = str(row['NomId'])
+for _,row in df.iterrows():
+    if pd.isna(row['NomId']): 
+        id = f"an{row['Ceremony']}_{row['Category']}_{_}"
+    else:
+        id = str(row['NomId'])
     filme = str(row['FilmId'])
     nome = str(row['Name'])
     winner =  str(row['Winner']) 
@@ -116,14 +121,24 @@ for _,row in df_nomeacao.iterrows():
     """,(id,categoria_ano_id,cerimonia_id,filme,nome,winner,note,detail,citation,mf))
 
 #Concorre
-for _,row in df_nomeacao.iterrows():
-    nomeado_id = str(row['NomineeIds'])
-    nomeacao_id = str(row['NomId'])
+for _, row in df.iterrows():
+    if pd.isna(row['NomineeIds']) and pd.notna(row['Nominees']):
+        nomeado_id = f"AUTO_{row['Ceremony']}_{row['Category']}_{_}"
+    elif pd.notna(row['NomineeIds']):
+        nomeado_id = str(row['NomineeIds'])
+    else:
+        continue  
+
+    if pd.isna(row['NomId']):
+        nomeacao_id = f"an{row['Ceremony']}_{row['Category']}_{_}"
+    else:
+        nomeacao_id = str(row['NomId'])
 
     cur.execute("""
-        INSERT OR IGNORE INTO concorre(nomeado_id,nomeacao_id)
-        VALUES (?,?)
-        """,(nomeado_id,nomeacao_id)) 
+        INSERT OR IGNORE INTO concorre(nomeado_id, nomeacao_id)
+        VALUES (?, ?)
+    """, (nomeado_id, nomeacao_id))
+
 
 
 # Salva alterações e fecha

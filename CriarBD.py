@@ -1,5 +1,12 @@
+import os
 import sqlite3
 #Para criar a BD, se ela já existir não usar.
+
+caminho_entrada = "Oscar-BD25\Oscars.db"
+
+if os.path.exists(caminho_entrada):
+    os.remove(caminho_entrada)
+
 conn = sqlite3.connect("Oscar-BD25\Oscars.db")
 cur = conn.cursor()
 
