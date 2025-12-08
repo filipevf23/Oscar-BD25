@@ -56,8 +56,9 @@ for _, row in df_filme.iterrows():
         VALUES (?,?)
     """, (id,nome,))  
 
-#Nomeado  -> Cada nomeado vai ter seu id próprio, talvez dividir melhor com base nisso?
+#Nomeado 
 for _,row in df.iterrows():
+    #Confere se existe nomeado e id, se falta id cria, se não tem nenhum ignora
     if pd.isna(row['Nominees']) and pd.isna(row['NomineeIds']):
         continue
     elif pd.isna(row['NomineeIds']):
@@ -92,6 +93,7 @@ for _,row in df_catAno.iterrows():
 
 #Nomeação 
 for _,row in df.iterrows():
+    #Confere se existe nomeacao e id, se falta id cria, se não tem nenhum ignora
     if pd.isna(row['NomId']): 
         id = f"an{row['Ceremony']}_{row['Category']}_{_}"
     else:
@@ -122,6 +124,8 @@ for _,row in df.iterrows():
 
 #Concorre
 for _, row in df.iterrows():
+    #Basicamente faz o mesmo em nomeado e nomeação, os que não existem cria o mesmo
+    #e como está pegando por linha vai ser necessariamente a mesma ligação
     if pd.isna(row['NomineeIds']) and pd.notna(row['Nominees']):
         nomeado_id = f"AUTO_{row['Ceremony']}_{row['Category']}_{_}"
     elif pd.notna(row['NomineeIds']):
