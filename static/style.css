@@ -61,6 +61,18 @@ a::selection {
   color: #0645ad;
 }
 
+a.absent {
+  color: #cc0000; }
+a.anchor {
+  display: block;
+  padding-left: 30px;
+  margin-left: -30px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0; }
+
 p {
   margin: 1em 0;
 }

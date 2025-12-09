@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Cerimônia #{{ id }} - {{ ano }}</h1>
+
+<table>
+    <tr>
+        <th>
+            Categoria
+        </th>
+        <th>
+            Ganhador
+        </th>
+    </tr>
+
+    {% for c in cerimonia %}
+
+    <tr>
+        <td>
+        <a href="{{ url_for('categoria', id=c.categoria_ano_id) }}">{{ c.categoria }}</a>
+        </td>
+        <td>
+            {{ c.nome }}
+        </td>
+    </tr>   
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

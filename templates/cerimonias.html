@@ -2,11 +2,7 @@
 
 {% block content %}
 
-<!-- 
-  Conteúdo apenas simples para começar. 
- 
-  Veja aplicação fazendo interface à MovieStream para exemplos concretos.
--->
+<h1>Cerimônias</h1>
 
 <table>
     <tr>
@@ -25,13 +21,13 @@
     </tr>
 
     {% for c in cerimonias %}
-    
+
     <tr>
         <td>
-        {{ c.cerimonia }}
+            <a href="{{ url_for('cerimonia', id=c.cerimonia_id) }}">{{ c.cerimonia_id }}</a>
         </td>
         <td>
-            {{ c.ano }}
+            <a href="{{ url_for('cerimonia', id=c.cerimonia_id) }}">{{ c.ano }}</a>
         </td>
         <td>
             {{ c.categorias }}
