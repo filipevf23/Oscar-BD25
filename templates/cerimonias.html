@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- 
+  Conteúdo apenas simples para começar. 
+ 
+  Veja aplicação fazendo interface à MovieStream para exemplos concretos.
+-->
+
+<table>
+    <tr>
+        <th>
+            Cerimônia
+        </th>
+        <th>
+            Ano
+        </th>
+        <th>
+            Categorias
+        </th>
+        <th>
+            Nomeacoes
+        </th>
+    </tr>
+
+    {% for c in cerimonias %}
+    
+    <tr>
+        <td>
+        {{ c.cerimonia }}
+        </td>
+        <td>
+            {{ c.ano }}
+        </td>
+        <td>
+            {{ c.categorias }}
+        </td>
+        <td>
+            {{ c.nomeacoes }}
+        </td>
+    </tr>   
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

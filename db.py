@@ -4,8 +4,7 @@ import re
 
 global DB, DB_FILE
 
-# TODO change this to your database file
-DB_FILE = 'Oscars.db'
+DB_FILE = 'Base_D_Dados/Oscars.db'
 
 DB = dict()
 
