@@ -2,7 +2,7 @@ import pandas as pd
 import sqlite3
 
 # Caminho do Excel
-caminho_entrada = "8-Oscars/oscars.xlsx"
+caminho_entrada = "Base_D_Dados\8-Oscars\oscars.xlsx"
 
 # Lê o Excel
 df = pd.read_excel(caminho_entrada)
