@@ -8,7 +8,7 @@ caminho_entrada = "8-Oscars/oscars.xlsx"
 df = pd.read_excel(caminho_entrada)
 
 # Conecta no SQLite
-conn = sqlite3.connect("Oscar-BD25\Base_D_Dados\Oscars.db")
+conn = sqlite3.connect("Base_D_Dados\Oscars.db")
 cur = conn.cursor()
 
 #Reiniciar BD

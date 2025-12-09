@@ -2,7 +2,7 @@ import os
 import sqlite3
 #Para criar a BD, se ela já existir não usar.
 
-caminho = "Oscar-BD25\Base_D_Dados\Oscars.db" #Só ter cuidado para estar certo  aqui
+caminho = "Base_D_Dados\Oscars.db" #Só ter cuidado para estar certo  aqui
 
 #Caso exista, remove para criar uma nova
 if os.path.exists(caminho): 
