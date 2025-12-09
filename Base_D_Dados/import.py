@@ -144,7 +144,6 @@ for _, row in df.iterrows():
     """, (nomeado_id, nomeacao_id))
 
 
-
 # Salva alterações e fecha
 conn.commit()
 conn.close()

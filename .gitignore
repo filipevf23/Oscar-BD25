@@ -1,5 +1,6 @@
 # Ambiente Virtual
 venv/
 .venv/
-Oscars.db
-Base_D_Dados\8-Oscars
+Base_D_Dados\Oscars.db
+__pycache__
+Base_D_Dados/8-Oscars/
