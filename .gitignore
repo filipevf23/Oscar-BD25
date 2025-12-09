@@ -2,4 +2,5 @@
 venv/
 .venv/
 Oscars.db
-Base_D_Dados\8-Oscars*
+__pycache__/
+Base_D_Dados/8-Oscars/
