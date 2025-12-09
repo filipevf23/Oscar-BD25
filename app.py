@@ -8,5 +8,6 @@ APP = Flask(__name__)
 # Start page
 @APP.route('/')
 def index():
-    # TODO
-    return render_template('index.html',message='Hello World!')
+
+    return render_template('index.html')
+
