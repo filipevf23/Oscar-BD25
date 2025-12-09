@@ -8,7 +8,7 @@ caminho_entrada = "8-Oscars/oscars.xlsx"
 df = pd.read_excel(caminho_entrada)
 
 # Conecta no SQLite
-conn = sqlite3.connect("Oscar-BD25/Oscars.db")
+conn = sqlite3.connect("Oscar-BD25\Base_D_Dados\Oscars.db")
 cur = conn.cursor()
 
 #Reiniciar BD
@@ -105,9 +105,9 @@ for _,row in df.iterrows():
     note = str(row['Note'])
     citation = str(row['Citation'])
     mf = str(row['MultifilmNomination'])
-    cerimonia_id = int(row['Ceremony'])
     #Para pegar os Ids corretos:
     categoria = str(row['Category'])
+    cerimonia_id = int(row['Ceremony'])
 
     cur.execute("""
         Select categoria_ano_id
@@ -117,10 +117,10 @@ for _,row in df.iterrows():
     categoria_ano_id = cur.fetchone()[0]
 
     cur.execute("""
-        INSERT OR IGNORE INTO nomeacao (nomeacao_id,categoria_ano_id,
-                cerimonia_id,filme_id,nome,ganhou,nota,detalhe,citation,multi_filme)
-        VALUES (?,?,?,?,?,?,?,?,?,?)
-    """,(id,categoria_ano_id,cerimonia_id,filme,nome,winner,note,detail,citation,mf))
+        INSERT OR IGNORE INTO nomeacao (nomeacao_id,categoria_ano_id
+                ,filme_id,nome,ganhou,nota,detalhe,citation,multi_filme)
+        VALUES (?,?,?,?,?,?,?,?,?)
+    """,(id,categoria_ano_id,filme,nome,winner,note,detail,citation,mf))
 
 #Concorre
 for _, row in df.iterrows():

@@ -2,12 +2,13 @@ import os
 import sqlite3
 #Para criar a BD, se ela já existir não usar.
 
-caminho_entrada = "Oscar-BD25\Oscars.db"
+caminho = "Oscar-BD25\Base_D_Dados\Oscars.db" #Só ter cuidado para estar certo  aqui
 
-if os.path.exists(caminho_entrada):
-    os.remove(caminho_entrada)
+#Caso exista, remove para criar uma nova
+if os.path.exists(caminho): 
+    os.remove(caminho)
 
-conn = sqlite3.connect("Oscar-BD25\Oscars.db")
+conn = sqlite3.connect(caminho)
 cur = conn.cursor()
 
 PRAGMA = cur.execute("PRAGMA foreign_keys = ON;")
@@ -76,7 +77,6 @@ cur.execute("""
 CREATE TABLE IF NOT EXISTS nomeacao (
     nomeacao_id TEXT PRIMARY KEY,
     categoria_ano_id INTEGER NOT NULL,
-    cerimonia_id INTEGER NOT NULL,
     filme_id TEXT,
     nome TEXT,
     ganhou TEXT,
@@ -84,7 +84,6 @@ CREATE TABLE IF NOT EXISTS nomeacao (
     detalhe TEXT,
     citation TEXT,
     multi_filme TEXT,
-    FOREIGN KEY (cerimonia_id) REFERENCES cerimonia (cerimonia_id),
     FOREIGN KEY (categoria_ano_id) REFERENCES categoria_ano (categoria_ano_id),
     FOREIGN KEY (filme_id) REFERENCES filme (filme_id)
 );
