@@ -2,7 +2,7 @@ import pandas as pd
 import sqlite3
 
 # Caminho do Excel
-caminho_entrada = "Base_D_Dados\8-Oscars\oscars.xlsx"
+caminho_entrada = "Base_D_Dados\oscars.xlsx"
 
 # Lê o Excel
 df = pd.read_excel(caminho_entrada)
@@ -49,6 +49,8 @@ for _, row in df_categoria.iterrows():
 df_filme = df[['Film','FilmId']]  
 
 for _, row in df_filme.iterrows():
+    if pd.isna(row['Film']):
+        continue
     nome = str(row['Film'])  
     id = str(row['FilmId'])
     cur.execute("""

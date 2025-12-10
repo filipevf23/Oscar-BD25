@@ -1,0 +1,19 @@
+List of Oscar nominees, including IMDB identifiers
+Source: https://github.com/DLu/oscar_data/blob/main/oscars.csv
+
+Ceremony - ceremony number
+Year
+Class - generic class of oscar
+CanonicalCategory - normalized category
+Category - category as named in the year
+NomId - nominee identifier
+Film - film title
+FilmId	- film identifier
+Name - Nominee name (sometimes, in the first years, the nominee was associated to more than one movie, or to none)
+Nominees - Nominees names, short form (in some cases there aretwo or more names, that should be separated)
+NomineeIds - nominees identifiers (idem)
+Winner - indicates the winning nominee
+Detail - complementary information
+Note - complementary information
+Citation - complementary information
+MultifilmNomination - if two or more films were associated to the award

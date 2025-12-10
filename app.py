@@ -72,3 +72,15 @@ def categoria(id):
     ganhador = nomeacoes[0]
     return render_template('categoria.html', ganhador=ganhador, nomeacoes=nomeacoes)
 
+@APP.route('/filmes/')
+def filmes():
+    filmes = db.execute("""
+        select f.nome as nome,c.cerimonia_id as id,c.ano as ano,count(ano.categoria) as nomeacoes
+        from filme f
+        join nomeacao n on n.filme_id=f.filme_id
+        join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
+        join cerimonia c on c.cerimonia_id=ano.cerimonia_id
+        Group by f.nome
+        Order by c.cerimonia_id;
+        """).fetchall()
+    return render_template('/filmes.html', filmes=filmes)

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Filmes</h1>
+
+<table>
+    <tr>
+        <th>
+            Filme
+        </th>
+        <th>
+            Cerimônia
+        </th>
+        <th>
+            Ano
+        </th>
+        <th>
+            Nomeacoes
+        </th>
+    </tr>
+
+    {% for f in filmes %}
+
+    <tr>
+        <td>
+            {{f.nome}}
+        </td>
+        <td>
+            <a href="{{ url_for('cerimonia', id=f.id) }}">{{ f.id }}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('cerimonia', id=f.id) }}">{{ f.ano }}</a>
+        </td>
+        <td>
+            {{ f.nomeacoes }}
+        </td>
+    </tr>   
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}
