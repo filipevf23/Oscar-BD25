@@ -9,13 +9,13 @@
 </p>
 
 
-<h2>Ganhador: {{ ganhador.nome }}</h2>
+<h2>Ganhador: {{ ganhador.nome }} ({{ ganhador.filme_nome}})</h2>
 
 <h3>Nomeados:</h3>
 
     {% for n in nomeacoes %}
 
-        <p>{{ n.nome }}</p>
+        <p>{{ n.nome }} ({{ n.filme_nome }})</p>
 
     {% endfor %}
 
