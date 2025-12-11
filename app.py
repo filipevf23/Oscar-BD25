@@ -50,9 +50,34 @@ def cerimonia(id):
         , (id,)
     ).fetchall()
     ano = cerimonia[0]['ano']
-    return render_template('cerimonia.html', cerimonia=cerimonia, id=id, ano=ano )
+    if id != 11 and id%10 == 1:
+        suffix = 'st'
+    elif id != 12 and id%10 == 2:
+        suffix = 'nd'
+    elif id != 13 and id%10 == 3:
+        suffix = 'rd'
+    else:
+        suffix = 'th'
+    return render_template('cerimonia.html', cerimonia=cerimonia, id=id, suffix=suffix, ano=ano )
 
-@APP.route('/cerimonia/categoria/<int:id>')
+@APP.route('/categorias/')
+def categorias():
+    aux = db.execute(
+        """
+        SELECT cat.categoria_canonica,  cat.classe, GROUP_CONCAT(DISTINCT ca.categoria), MIN(cer.ano) AS ano, ca.cerimonia_id
+        FROM cerimonia as cer
+        JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
+        JOIN categoria as cat on cat.categoria_id = ca.categoria_id
+        GROUP BY cat.categoria_canonica, cat.classe
+        ORDER BY ano 
+        """
+    ).fetchall()
+    categorias = []
+    for row in aux:
+        categorias.append({'canonica':row[0], 'classe':row[1], 'nomes':row[2].split(","), 'ano':row[3], 'cerimonia_id':row[4]})
+    return render_template('categorias.html', categorias=categorias)
+
+@APP.route('/categorias/<int:id>')
 def categoria(id):
     nomeacoes = db.execute(
         """
@@ -70,7 +95,16 @@ def categoria(id):
         , (id,)
     ).fetchall()
     ganhador = nomeacoes[0]
-    return render_template('categoria.html', ganhador=ganhador, nomeacoes=nomeacoes)
+    ano = ganhador['ano']
+    if id != 11 and id%10 == 1:
+        suffix = 'st'
+    elif id != 12 and id%10 == 2:
+        suffix = 'nd'
+    elif id != 13 and id%10 == 3:
+        suffix = 'rd'
+    else:
+        suffix = 'th'
+    return render_template('categoria.html', ganhador=ganhador, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
 def filmes():
@@ -194,3 +228,4 @@ def paises():
     
 
     return render_template('paises.html',paises = paises)
+

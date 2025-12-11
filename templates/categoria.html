@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
+{% block header_nav %}
+<p>
+    <a href="{{url_for('cerimonia', id=ganhador.cerimonia_id)}}">Back</a>
+</p>
+{% endblock %}
+
 {% block content %}
 
 <h1>Categoria: {{ ganhador.categoria }}</h1>
 <h3>Categoria Canônica: {{ ganhador.categoria_canonica }}</h3>
 <p>
-    <a href="{{ url_for('cerimonia', id=ganhador.cerimonia_id) }}">Cerimônia #{{ ganhador.cerimonia_id }}</a> - {{ ganhador.ano }}
+    <a href="{{ url_for('cerimonia', id=ganhador.cerimonia_id) }}">{{ ganhador.cerimonia_id }}{{suffix}} Oscars, {{ ganhador.ano }}</a>
 </p>
 
 

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Categorias</h1>
+
+<table>
+    <tr>
+        <th>Nome Canônico</th>
+        <th>Classe</th>
+        <th>Diferentes Nomes Utilizados</th>
+        <th>Primeira Aparição</th>
+    </tr>
+
+    {% for c in categorias %}
+
+    <tr>
+        <td>{{ c['canonica'] }}</td>
+        <td>{{ c['classe'] }}</td>
+        <td>
+            {% for i in range(c['nomes']|length) %}
+            {{ c['nomes'][i] }}
+            <br>
+            {% endfor %}
+        </td>
+        
+        <td><a href="{{url_for('cerimonia', id=c['cerimonia_id'])}}">{{ c['ano'] }}</a></td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+{% endblock %}
