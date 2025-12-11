@@ -51,13 +51,13 @@ def cerimonia(id):
     ).fetchall()
     ano = cerimonia[0]['ano']
     if id != 11 and id%10 == 1:
-        suffix = 'st'
+        suffix = 'ST'
     elif id != 12 and id%10 == 2:
-        suffix = 'nd'
+        suffix = 'ND'
     elif id != 13 and id%10 == 3:
-        suffix = 'rd'
+        suffix = 'RD'
     else:
-        suffix = 'th'
+        suffix = 'TH'
     return render_template('cerimonia.html', cerimonia=cerimonia, id=id, suffix=suffix, ano=ano )
 
 @APP.route('/categorias/')
@@ -97,13 +97,13 @@ def categoria(id):
     ganhador = nomeacoes[0]
     ano = ganhador['ano']
     if id != 11 and id%10 == 1:
-        suffix = 'st'
+        suffix = 'ST'
     elif id != 12 and id%10 == 2:
-        suffix = 'nd'
+        suffix = 'ND'
     elif id != 13 and id%10 == 3:
-        suffix = 'rd'
+        suffix = 'RD'
     else:
-        suffix = 'th'
+        suffix = 'TH'
     return render_template('categoria.html', ganhador=ganhador, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
@@ -146,6 +146,7 @@ def nomeados():
         """
         SELECT n.nomeado_id, n.nome 
         FROM nomeado AS n
+        ORDER BY n.nome
         """
     ).fetchall()
     ids = []
