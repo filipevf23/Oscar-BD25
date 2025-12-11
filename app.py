@@ -129,8 +129,8 @@ def filme(id):
         join nomeacao n on n.filme_id=f.filme_id
         join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
         join cerimonia c on c.cerimonia_id=ano.cerimonia_id
-        join concorre con on con.nomeacao_id=n.nomeacao_id
-        join nomeado p on p.nomeado_id=con.nomeado_id
+        left join concorre con on con.nomeacao_id=n.nomeacao_id
+        left join nomeado p on p.nomeado_id=con.nomeado_id
         where f.filme_id = ?
         Order by n.ganhou;
         """,(id,)).fetchall()

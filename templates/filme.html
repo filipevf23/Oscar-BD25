@@ -26,9 +26,13 @@
             <a href="{{ url_for('categoria', id=f.categoria_ano_id) }}">{{ f.categoria }}</a>
         </td>
         <td>
-            <a href="{{ url_for('nomeado', id=f.nomeado_id) }}">
-        {{ f.nomeado }}
-            </a>
+            {% if f.nomeado_id %}
+                <a href="{{ url_for('nomeado', id=f.nomeado_id) }}">
+                    {{ f.nomeado }}
+                </a>
+            {% else %}
+                {{ f.nomeado or '—' }}
+          {% endif %}
         </td>
         <td>
             {% if f.ganhou == '1.0' %}
