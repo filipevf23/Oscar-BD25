@@ -89,7 +89,8 @@ def filmes():
 def filme(id):
     filme = db.execute(""" 
         select f.nome as nome,c.cerimonia_id as cerimonia_id,c.ano as ano,ano.categoria as categoria,
-                       p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id
+                       p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id,
+                       p.nomeado_id as nomeado_id
         from filme f
         join nomeacao n on n.filme_id=f.filme_id
         join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
