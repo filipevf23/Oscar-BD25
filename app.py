@@ -103,3 +103,44 @@ def filme(id):
     cerimonia = filme[0]['cerimonia_id']
     ano = filme[0]['ano']
     return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia)
+    nome_filme = filme[0]
+    return render_template('/filme.html',filme=filme,nome_filme=nome_filme)
+
+@APP.route('/nomeados/')
+def nomeados():
+    nomeados = db.execute(
+        """
+        SELECT n.nomeado_id, n.nome 
+        FROM nomeado AS n
+        """
+    ).fetchall()
+    ids = []
+    nomes = []
+    for n in nomeados:
+        ids.append(n[0].split(','))
+        nomes.append(n[1].split(','))
+    return render_template('nomeados.html', nomeados=nomeados, ids=ids, nomes=nomes)
+
+@APP.route('/nomeados/<id>')
+def nomeado(id):
+    nomeado = db.execute(
+        """
+        SELECT n.nomeado_id, n.nome 
+        FROM nomeado AS n
+        WHERE n.nomeado_id = ?
+        """
+        , (id,) ).fetchone()
+    nomeacoes = db.execute(
+        """
+        SELECT ca.categoria, ca.categoria_ano_id, f.nome AS filme_nome, f.filme_id, cer.ano, cer.cerimonia_id
+        FROM nomeacao AS n
+        JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
+        JOIN cerimonia AS cer ON cer.cerimonia_id = ca.cerimonia_id
+        JOIN concorre AS co ON co.nomeacao_id = n.nomeacao_id
+        JOIN nomeado AS nom ON nom.nomeado_id = co.nomeado_id
+        JOIN filme AS f ON f.filme_id = n.filme_id
+        WHERE nom.nomeado_id = ?
+        """
+        , (id,) ).fetchall()
+
+    return render_template('nomeado.html', nomeado=nomeado, nomeacoes=nomeacoes)
