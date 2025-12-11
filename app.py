@@ -64,7 +64,7 @@ def cerimonia(id):
 def categorias():
     aux = db.execute(
         """
-        SELECT cat.categoria_canonica,  cat.classe, GROUP_CONCAT(DISTINCT ca.categoria), MIN(cer.ano) AS ano, ca.cerimonia_id
+        SELECT cat.categoria_canonica,  cat.classe, GROUP_CONCAT(DISTINCT ca.categoria), MIN(cer.ano) AS ano, ca.cerimonia_id, cat.categoria_id
         FROM cerimonia as cer
         JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
         JOIN categoria as cat on cat.categoria_id = ca.categoria_id
@@ -74,14 +74,14 @@ def categorias():
     ).fetchall()
     categorias = []
     for row in aux:
-        categorias.append({'canonica':row[0], 'classe':row[1], 'nomes':row[2].split(","), 'ano':row[3], 'cerimonia_id':row[4]})
+        categorias.append({'canonica':row[0], 'classe':row[1], 'nomes':row[2].split(","), 'ano':row[3], 'cerimonia_id':row[4], 'categoria_id':row[5]})
     return render_template('categorias.html', categorias=categorias)
 
-@APP.route('/categorias/<int:id>')
-def categoria(id):
+@APP.route('/categoria-ano/<int:id>')
+def categoria_ano(id):
     nomeacoes = db.execute(
         """
-        SELECT cat.categoria_canonica, ca.categoria, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id
+        SELECT cat.categoria_canonica, ca.categoria, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
         FROM cerimonia as cer
         JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
         JOIN categoria as cat on cat.categoria_id = ca.categoria_id
@@ -104,7 +104,7 @@ def categoria(id):
         suffix = 'RD'
     else:
         suffix = 'TH'
-    return render_template('categoria.html', ganhador=ganhador, nomeacoes=nomeacoes, suffix=suffix)
+    return render_template('categoria_ano.html', ganhador=ganhador, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
 def filmes():
@@ -137,7 +137,15 @@ def filme(id):
     fnome = filme[0]['nome']
     cerimonia = filme[0]['cerimonia_id']
     ano = filme[0]['ano']
-    return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia)
+    if cerimonia != 11 and cerimonia%10 == 1:
+        suffix = 'ST'
+    elif cerimonia != 12 and cerimonia%10 == 2:
+        suffix = 'ND'
+    elif cerimonia != 13 and cerimonia%10 == 3:
+        suffix = 'RD'
+    else:
+        suffix = 'TH'
+    return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia, suffix=suffix)
 
 
 @APP.route('/nomeados/')
@@ -146,7 +154,6 @@ def nomeados():
         """
         SELECT n.nomeado_id, n.nome 
         FROM nomeado AS n
-        ORDER BY n.nome
         """
     ).fetchall()
     ids = []
@@ -230,3 +237,16 @@ def paises():
 
     return render_template('paises.html',paises = paises)
 
+@APP.route('/categorias/<int:id>')
+def categoria(id):
+    categoria = db.execute(
+        """
+        SELECT c.categoria_id, c.categoria_canonica, ca.categoria, c.classe, ca.categoria_ano_id, cer.ano
+        FROM categoria AS c
+        JOIN categoria_ano AS ca ON ca.categoria_id = c.categoria_id
+        JOIN cerimonia AS cer ON cer.cerimonia_id = ca.cerimonia_id
+        WHERE c.categoria_id = ?
+        ORDER BY cer.cerimonia_id ASC
+        """
+    , (id,)).fetchall()
+    return render_template('categoria.html', categoria=categoria)

@@ -15,7 +15,7 @@
     {% for c in categorias %}
 
     <tr>
-        <td>{{ c['canonica'] }}</td>
+        <td><a href="{{url_for('categoria', id=c['categoria_id'])}}">{{ c['canonica'] }}</a></td>
         <td>{{ c['classe'] }}</td>
         <td>
             {% for i in range(c['nomes']|length) %}

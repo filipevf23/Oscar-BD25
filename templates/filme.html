@@ -5,7 +5,7 @@
 <h1>{{fnome}}</h1>
 
 <p>
-    Cerimonia : #<a href="{{ url_for('cerimonia', id=cerimonia) }}">{{ cerimonia }}</a> - <a href="{{ url_for('cerimonia', id=cerimonia) }}">{{ ano }}</a>
+    <a href="{{ url_for('cerimonia', id=cerimonia) }}">{{ cerimonia }}{{suffix}} OSCARS | {{ ano }}</a>
 </p>
 
 <table>

@@ -2,27 +2,40 @@
 
 {% block header_nav %}
 <p>
-    <a href="{{url_for('cerimonia', id=ganhador.cerimonia_id)}}">BACK</a>
+    <a href="{{url_for('categorias')}}">BACK</a>
 </p>
+    
 {% endblock %}
 
 {% block content %}
 
-<h1>Categoria: {{ ganhador.categoria }}</h1>
-<h3>Categoria Canônica: {{ ganhador.categoria_canonica }}</h3>
-<p>
-    <a href="{{ url_for('cerimonia', id=ganhador.cerimonia_id) }}">{{ ganhador.cerimonia_id }}{{suffix}} OSCARS | {{ ganhador.ano }}</a>
-</p>
+<h1>{{ categoria[0].categoria_canonica }}</h1>
+<h2>Classe: {{categoria[0].classe}}</h2>
+<h2>Adicionada em {{ categoria[0].ano }}</h2>
 
+<table>
+    <tr>
+        <th>
+            Nome Utilizados
+        </th>
+        <th>
+            Ano
+        </th>
+    </tr>
 
-<h2>Ganhador: {{ ganhador.nome }} ({{ ganhador.filme_nome}})</h2>
+    {% for c in categoria %}
 
-<h3>Nomeados:</h3>
-
-    {% for n in nomeacoes %}
-
-        <p>{{ n.nome }} ({{ n.filme_nome }})</p>
+    <tr>
+        <td>
+        <a href="{{ url_for('categoria_ano', id=c.categoria_ano_id) }}">{{ c.categoria }}</a>
+        </td>
+        <td>
+            {{ c.ano }}
+        </td>
+    </tr>   
 
     {% endfor %}
+
+</table>
 
 {% endblock %}
