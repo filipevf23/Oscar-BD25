@@ -10,22 +10,22 @@
             Pais
         </th>
         <th>
-            Nomeacoes
+            Vitorias
         </th>
         <th>
-            Vitorias
+            Nomeacoes
         </th>
     </tr>
     {% for i in paises%}
     <tr>
         <td>
-            {{i.Pais}}
+            {{i['Pais']}}
         </td>
         <td>
-            {{i.Nomeacoes}}
+            {{i['vitorias']}}
         </td>
         <td>
-            {{i.vitorias}}
+            {{i['Nomeacoes']}}
         </td>
     </tr>
     {% endfor %}

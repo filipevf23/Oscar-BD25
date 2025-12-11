@@ -147,7 +147,7 @@ def nomeado(id):
 
 @APP.route('/paises/')
 def paises():
-    paises = db.execute("""
+    aux = db.execute("""
         with vit as (
         select no.nome as Pais,ca.cerimonia_id as id, count(f.nome) as Vitorias
         from nomeacao no 
@@ -166,6 +166,32 @@ def paises():
         left join vit on vit.Pais = no.nome
         where c.categoria_id= 46 and no.nome != 'nan'
         Group by no.nome 
-        Order by Nomeacoes desc;
+        Order by vitorias DESC, Nomeacoes DESC;
         """).fetchall()
+    auxList = []
+    for p in aux:
+        auxList.append({'Pais':p[0], 'Nomeacoes':p[1], 'vitorias':p[2]})
+    paises = []
+    for p in auxList:
+        if p['Pais'] == 'Federal Republic of Germany - West; Gyula Trebitsch and Walter Koppel, Producers':
+            paises.append({'Pais':'Federal Republic of Germany - West', 
+                           'Nomeacoes':p['Nomeacoes'],
+                           'vitorias':p['vitorias']})
+        elif len(paises) == 0 or "Czech" in p['Pais'] or "German" in p['Pais']:
+            paises.append(p)
+        else:
+            exists = False
+            for w in p['Pais'].split(';'):
+                for i in range(len(paises)):
+                    if w in paises[i]['Pais']:
+                        exists = True
+                        paises[i]['Nomeacoes'] += p['Nomeacoes']
+                        paises[i]['vitorias'] += p['vitorias']
+                        break
+                if exists: break
+            if not exists:
+                print("Addind " + p['Pais'])
+                paises.append(p)
+    
+
     return render_template('paises.html',paises = paises)
