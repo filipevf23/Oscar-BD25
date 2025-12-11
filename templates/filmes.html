@@ -24,7 +24,7 @@
 
     <tr>
         <td>
-            {{f.nome}}
+            <a href="{{ url_for('filme', id=f.fid) }}">{{ f.nome }}</a>
         </td>
         <td>
             <a href="{{ url_for('cerimonia', id=f.id) }}">{{ f.id }}</a>
