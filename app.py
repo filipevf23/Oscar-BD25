@@ -103,8 +103,7 @@ def filme(id):
     cerimonia = filme[0]['cerimonia_id']
     ano = filme[0]['ano']
     return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia)
-    nome_filme = filme[0]
-    return render_template('/filme.html',filme=filme,nome_filme=nome_filme)
+
 
 @APP.route('/nomeados/')
 def nomeados():
