@@ -2,7 +2,7 @@ import pandas as pd
 import sqlite3
 
 # Caminho do Excel
-caminho_entrada = "Base_D_Dados\oscars.xlsx"
+caminho_entrada = "Base_D_Dados\8-Oscars\oscars.xlsx"
 
 # Lê o Excel
 df = pd.read_excel(caminho_entrada)
@@ -59,12 +59,12 @@ for _, row in df_filme.iterrows():
     """, (id,nome,))  
 
 #Nomeado 
-for _,row in df.iterrows():
+for j,row in df.iterrows():
     #Confere se existe nomeado e id, se falta id cria, se não tem nenhum ignora
     if pd.isna(row['Nominees']) and pd.isna(row['NomineeIds']):
         continue
     elif pd.isna(row['NomineeIds']):
-        id = f"AUTO_{row['Ceremony']}_{row['Category']}_{_}"
+        id = f"nn{row['Ceremony']}{j}"
     else:
         id = str(row['NomineeIds'])
     nome = str(row['Nominees'])
@@ -97,7 +97,7 @@ for _,row in df_catAno.iterrows():
 for _,row in df.iterrows():
     #Confere se existe nomeacao e id, se falta id cria, se não tem nenhum ignora
     if pd.isna(row['NomId']): 
-        id = f"an{row['Ceremony']}_{row['Category']}_{_}"
+        id = f"anw{row['Ceremony']}{j}"
     else:
         id = str(row['NomId'])
     filme = str(row['FilmId'])
@@ -125,18 +125,18 @@ for _,row in df.iterrows():
     """,(id,categoria_ano_id,filme,nome,winner,note,detail,citation,mf))
 
 #Concorre
-for _, row in df.iterrows():
+for j, row in df.iterrows():
     #Basicamente faz o mesmo em nomeado e nomeação, os que não existem cria o mesmo
     #e como está pegando por linha vai ser necessariamente a mesma ligação
     if pd.isna(row['NomineeIds']) and pd.notna(row['Nominees']):
-        nomeado_id = f"AUTO_{row['Ceremony']}_{row['Category']}_{_}"
+        nomeado_id = f"nn{row['Ceremony']}{j}"
     elif pd.notna(row['NomineeIds']):
         nomeado_id = str(row['NomineeIds'])
     else:
         continue  
 
     if pd.isna(row['NomId']):
-        nomeacao_id = f"an{row['Ceremony']}_{row['Category']}_{_}"
+        nomeacao_id =  f"anw{row['Ceremony']}{j}"
     else:
         nomeacao_id = str(row['NomId'])
 

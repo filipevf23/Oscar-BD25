@@ -124,13 +124,13 @@ def filme(id):
     filme = db.execute(""" 
         select f.nome as nome,c.cerimonia_id as cerimonia_id,c.ano as ano,ano.categoria as categoria,
                        p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id,
-                       p.nomeado_id as nomeado_id
+                       p.nomeado_id as nomeado_id,n.nome as nomeacao
         from filme f
         join nomeacao n on n.filme_id=f.filme_id
         join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
         join cerimonia c on c.cerimonia_id=ano.cerimonia_id
-        join concorre con on con.nomeacao_id=n.nomeacao_id
-        join nomeado p on p.nomeado_id=con.nomeado_id
+        left join concorre con on con.nomeacao_id=n.nomeacao_id
+        left join nomeado p on p.nomeado_id=con.nomeado_id
         where f.filme_id = ?
         Order by n.ganhou;
         """,(id,)).fetchall()
@@ -233,9 +233,23 @@ def paises():
                 if exists: break
             if not exists:
                 paises.append(p)
-    
-
     return render_template('paises.html',paises = paises)
+
+@APP.route('/paises/<id>')
+def pais(id):
+    pais = db.execute("""
+        select no.nome as Pais, f.nome as Filme, f.filme_id as filme_id,
+                       cerimonia.ano as ano, no.ganhou as ganhou, cerimonia.cerimonia_id as cerimonia_id
+        from nomeacao no 
+        join categoria_ano ca on ca.categoria_ano_id=no.categoria_ano_id
+        join categoria c on c.categoria_id=ca.categoria_id
+        join filme f on f.filme_id = no.filme_id
+        join cerimonia on cerimonia.cerimonia_id = ca.cerimonia_id
+        where c.categoria_id = 46 and no.nome = ?
+        Order by cerimonia.cerimonia_id;
+        """,(id,)).fetchall()
+    nome = pais[0]['Pais']
+    return render_template('pais.html',pais = pais,nome=nome)
 
 @APP.route('/categorias/<int:id>')
 def categoria(id):
