@@ -2,6 +2,40 @@
 
 {% block content %}
 
-<h1> A </h1>
+<h1>{{fnome}}</h1>
 
+<p>
+    Cerimonia : #<a href="{{ url_for('cerimonia', id=cerimonia) }}">{{ cerimonia }}</a> - <a href="{{ url_for('cerimonia', id=cerimonia) }}">{{ ano }}</a>
+</p>
+
+{%for f in filme %}
+{% if f.ganhou =='1.0'}
+<p>
+    Premios Recebidos:
+</p>
+<table>
+    <tr>
+        <th>
+            Categoria
+        </th>
+        <th>
+            Nomeado
+        </th>
+    </tr>
+    {% for f in filme %}
+    <tr>
+        <td>
+            <a href="{{ url_for('categoria', id=f.categoria_ano_id) }}">{{ f.categoria }}</a>
+        </td>
+        <td>
+            {{f.nomeado}}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>
+    
+</p>
+{% endfor %}
 {% endblock %}

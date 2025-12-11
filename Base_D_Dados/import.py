@@ -150,4 +150,4 @@ for _, row in df.iterrows():
 conn.commit()
 conn.close()
 
-print("Filme e Cerimônia inseridos com sucesso!")
+print("Foi")

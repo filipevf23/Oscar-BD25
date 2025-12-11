@@ -88,13 +88,18 @@ def filmes():
 @APP.route('/filmes/<id>/')
 def filme(id):
     filme = db.execute(""" 
-        select f.nome,c.cerimonia_id,ano.categoria, n.ganhou
+        select f.nome as nome,c.cerimonia_id as cerimonia_id,c.ano as ano,ano.categoria as categoria,
+                       p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id
         from filme f
         join nomeacao n on n.filme_id=f.filme_id
         join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
         join cerimonia c on c.cerimonia_id=ano.cerimonia_id
+        join concorre con on con.nomeacao_id=n.nomeacao_id
+        join nomeado p on p.nomeado_id=con.nomeado_id
         where f.filme_id = ?
-        Order by c.cerimonia_id,n.ganhou desc;
+        Order by n.ganhou;
         """,(id,)).fetchall()
-    nome_filme = filme[0]
-    return render_template('/filme.html',filme=filme,nome_filme=nome_filme)
+    fnome = filme[0]['nome']
+    cerimonia = filme[0]['cerimonia_id']
+    ano = filme[0]['ano']
+    return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia)
