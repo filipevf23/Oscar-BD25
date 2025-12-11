@@ -144,3 +144,28 @@ def nomeado(id):
         , (id,) ).fetchall()
 
     return render_template('nomeado.html', nomeado=nomeado, nomeacoes=nomeacoes)
+
+@APP.route('/paises/')
+def paises():
+    paises = db.execute("""
+        with vit as (
+        select no.nome as Pais,ca.cerimonia_id as id, count(f.nome) as Vitorias
+        from nomeacao no 
+        join categoria_ano ca on ca.categoria_ano_id=no.categoria_ano_id
+        join categoria c on c.categoria_id=ca.categoria_id
+        join filme f on f.filme_id = no.filme_id
+        where c.categoria_id= 46 and no.nome != 'nan' and no.ganhou = '1.0'
+        Group by no.nome 
+        Order by vitorias desc
+        )
+        select no.nome as Pais, count(f.nome) as Nomeacoes, coalesce(vitorias,0) as vitorias
+        from nomeacao no 
+        join categoria_ano ca on ca.categoria_ano_id=no.categoria_ano_id
+        join categoria c on c.categoria_id=ca.categoria_id
+        join filme f on f.filme_id = no.filme_id
+        left join vit on vit.Pais = no.nome
+        where c.categoria_id= 46 and no.nome != 'nan'
+        Group by no.nome 
+        Order by Nomeacoes desc;
+        """).fetchall()
+    return render_template('paises.html',paises = paises)

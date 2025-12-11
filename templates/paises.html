@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Paises</h1>
+
+<table>
+    <tr>
+        <th>
+            Pais
+        </th>
+        <th>
+            Nomeacoes
+        </th>
+        <th>
+            Vitorias
+        </th>
+    </tr>
+    {% for i in paises%}
+    <tr>
+        <td>
+            {{i.Pais}}
+        </td>
+        <td>
+            {{i.Nomeacoes}}
+        </td>
+        <td>
+            {{i.vitorias}}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
