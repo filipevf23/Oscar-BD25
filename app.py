@@ -233,9 +233,23 @@ def paises():
                 if exists: break
             if not exists:
                 paises.append(p)
-    
-
     return render_template('paises.html',paises = paises)
+
+@APP.route('/paises/<id>')
+def pais(id):
+    pais = db.execute("""
+        select no.nome as Pais, f.nome as Filme, f.filme_id as filme_id,
+                       cerimonia.ano as ano, no.ganhou as ganhou, cerimonia.cerimonia_id as cerimonia_id
+        from nomeacao no 
+        join categoria_ano ca on ca.categoria_ano_id=no.categoria_ano_id
+        join categoria c on c.categoria_id=ca.categoria_id
+        join filme f on f.filme_id = no.filme_id
+        join cerimonia on cerimonia.cerimonia_id = ca.cerimonia_id
+        where c.categoria_id = 46 and no.nome = ?
+        Order by cerimonia.cerimonia_id;
+        """,(id,)).fetchall()
+    nome = pais[0]['Pais']
+    return render_template('pais.html',pais = pais,nome=nome)
 
 @APP.route('/categorias/<int:id>')
 def categoria(id):

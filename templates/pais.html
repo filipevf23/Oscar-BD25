@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{nome}}</h1>
+
+<table>
+    <tr>
+        <th>
+            Filme
+        </th>
+        <th>
+            Ano
+        </th>
+        <th>
+            Resultado
+        </th>
+    </tr>
+    {% for i in pais%}
+    <tr>
+        <td>
+            <a href="{{ url_for('filme', id=i.filme_id) }}">{{ i.Filme }}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('cerimonia', id=i.cerimonia_id) }}">{{ i.ano }}</a>
+        </td>
+        <td>
+            {% if i.ganhou == '1.0' %}
+            Ganhou
+            {% else %}
+            Perdeu
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

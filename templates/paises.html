@@ -19,7 +19,7 @@
     {% for i in paises%}
     <tr>
         <td>
-            {{i['Pais']}}
+             <a href="{{url_for('pais', id=i['Pais'])}}">{{ i['Pais'] }}</a>
         </td>
         <td>
             {{i['vitorias']}}
