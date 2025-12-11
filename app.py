@@ -181,7 +181,7 @@ def paises():
             paises.append(p)
         else:
             exists = False
-            for w in p['Pais'].split(';'):
+            for w in (p['Pais'].split(' ') + p['Pais'].split(';')):
                 for i in range(len(paises)):
                     if w in paises[i]['Pais']:
                         exists = True
@@ -190,7 +190,6 @@ def paises():
                         break
                 if exists: break
             if not exists:
-                print("Addind " + p['Pais'])
                 paises.append(p)
     
 
