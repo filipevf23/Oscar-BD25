@@ -11,27 +11,34 @@
 
 <h2>
     Ganhador: 
-        {% if ganhador.nomeado_id %}
-        <a href="{{url_for('nomeado', id=ganhador.nomeado_id)}}">{{ ganhador.nome }}</a>
+        {% if nomeados[0]['nomeados_id'][0] %}
+            {% for i in range(nomeados[0]['nomeados_id']|length) %}
+                {% if i > 0 %}, {% endif %}
+                <a href="{{url_for('nomeado', id=nomeados[0]['nomeados_id'][i])}}">{{ nomeados[0]['nomes'][i] }}</a>
+            {% endfor %}
         {% else %}
-        <a href="{{url_for('pais', id=ganhador.pais)}}">{{ ganhador.pais }}</a>
+            <a href="{{url_for('pais', id=ganhador.nome)}}">{{ ganhador.nome }}</a>      
         {% endif %}
-         (<a href="{{url_for('filme', id=ganhador.filme_id)}}">{{ ganhador.filme_nome }}</a>)
+            {% if ganhador.filme_id %}
+                (<a href="{{url_for('filme', id=ganhador.filme_id)}}">{{ ganhador.filme_nome }}</a>)
+            {% endif %}
 </h2>
 
 <table>
     <tr>
         <th>Nomeações</th>
     </tr>
-    {% for n in nomeacoes %}
+    {% for i in range(nomeacoes|length) %}
     <tr>
         <td>
-            <a href="{{url_for('nomeacao', id=n.nomeacao_id)}}">
-                {% if ganhador.nomeado_id %}
-                {{ n.nome }} ({{ n.filme_nome }})
-                {% else %}
-                {{ n.pais }} ({{ n.filme_nome }})
-                {% endif %}
+            <a href="{{url_for('nomeacao', id=nomeacoes[i].nomeacao_id)}}">
+                    {% for j in range(nomeados[i]['nomes']|length) %}
+                        {% if j > 0 %}, {% endif %}
+                        {{ nomeados[i]['nomes'][j] }}
+                    {% endfor %}
+                    {% if nomeacoes[i].filme_id %}
+                        ({{ nomeacoes[i].filme_nome }})
+                    {% endif %}
             </a> 
         </td>
     </tr>

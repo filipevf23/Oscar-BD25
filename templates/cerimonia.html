@@ -17,17 +17,32 @@
         </th>
     </tr>
 
-    {% for c in cerimonia %}
+    {% for i in range(cerimonia|length) %}
 
     <tr>
         <td>
-            <a href="{{ url_for('categoria_ano', id=c.categoria_ano_id) }}">{{ c.categoria }}</a>
+            <a href="{{ url_for('categoria_ano', id=cerimonia[i].categoria_ano_id) }}">{{ cerimonia[i].categoria }}</a>
         </td>
         <td>
-            <a href="{{ url_for('nomeado', id=c.nomeado_id) }}">{{ c.nome }}</a>
+            {% for j in range(nomeados[i]['nomeados_id']|length) %}
+                {% if nomeados[i]['nomeados_id'][0] %}
+                    <a href="{{ url_for('nomeado', id=nomeados[i]['nomeados_id'][j]) }}">{{ nomeados[i]['nomes'][j] }}</a>
+                {% else %}
+                    {% if cerimonia[i].nome %}
+                        <a href="{{ url_for('pais', id=cerimonia[i].nome) }}">{{ cerimonia[i].nome }}</a>
+                    {% else %}
+                        - 
+                    {% endif %}
+                {% endif %}
+                <br>
+            {% endfor %}
         </td>
         <td>
-            <a href="{{ url_for('filme', id=c.filme_id) }}">{{ c.filme_nome }}</a>
+            {% if cerimonia[i].filme_id %}
+            <a href="{{ url_for('filme', id=cerimonia[i].filme_id) }}">{{ cerimonia[i].filme_nome }}</a>
+            {% else %}
+                -  
+            {% endif %}
         </td>
     </tr>   
 

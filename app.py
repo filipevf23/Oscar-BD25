@@ -35,23 +35,45 @@ def cerimonias():
 
 @APP.route('/cerimonia/<int:id>/')
 def cerimonia(id):
+    aux = db.execute(
+        """
+        SELECT ca.categoria_ano_id, no.nomeado_id, no.nome
+        FROM nomeacao n
+        JOIN concorre c on c.nomeacao_id = n.nomeacao_id
+        JOIN nomeado no on no.nomeado_id = c.nomeado_id
+        JOIN categoria_ano ca ON ca.categoria_ano_id = n.categoria_ano_id
+        WHERE ca.cerimonia_id = ?
+        AND n.ganhou = '1.0'
+        """
+    , (id,)).fetchall()
     cerimonia = db.execute(
         """
-        SELECT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, ne.nomeado_id, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id
+        SELECT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, n.nome, f.nome AS filme_nome, ca.categoria_ano_id
         FROM cerimonia AS cer
         JOIN categoria_ano AS ca ON ca.cerimonia_id = cer.cerimonia_id
         JOIN nomeacao AS n ON n.categoria_ano_id = ca.categoria_ano_id
-        JOIN filme AS f ON f.filme_id = n.filme_id
-        JOIN concorre AS conc ON conc.nomeacao_id = n.nomeacao_id
-        JOIN nomeado AS ne ON ne.nomeado_id = conc.nomeado_id
+        LEFT JOIN filme AS f ON f.filme_id = n.filme_id
+        LEFT JOIN concorre AS conc ON conc.nomeacao_id = n.nomeacao_id
         WHERE n.ganhou = '1.0'
         AND cer.cerimonia_id = ?
+        ORDER BY ca.categoria
         """
         , (id,)
     ).fetchall()
     ano = cerimonia[0]['ano']
+    nomeados = []
+    for row in cerimonia:
+        aux1 = []
+        aux2 = []
+        for r in aux:
+            if r['categoria_ano_id'] == row['categoria_ano_id']:
+                aux1.append(r['nomeado_id'])
+                aux2.append(r['nome'])
+        nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
+    for i in nomeados:
+        print(i)
     suffix = getSuffix(id)
-    return render_template('cerimonia.html', cerimonia=cerimonia, id=id, suffix=suffix, ano=ano )
+    return render_template('cerimonia.html', cerimonia=cerimonia, nomeados=nomeados, id=id, suffix=suffix, ano=ano )
 
 @APP.route('/categorias/')
 def categorias():
@@ -103,25 +125,41 @@ def categorias_ano():
 
 @APP.route('/categorias-ano/<int:id>')
 def categoria_ano(id):
+    aux = db.execute(
+        """
+        SELECT n.nomeacao_id, no.nomeado_id, no.nome
+        FROM nomeacao n
+        JOIN concorre c on c.nomeacao_id = n.nomeacao_id
+        JOIN nomeado no on no.nomeado_id = c.nomeado_id
+        WHERE n.categoria_ano_id = ?
+        """
+    , (id,)).fetchall()
     nomeacoes = db.execute(
         """
-        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, ne.nomeado_id, f.nome AS filme_nome, 
-               ne.nome, n.nome as pais, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
+        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, f.nome AS filme_nome, 
+                n.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
         FROM cerimonia as cer
         JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
         JOIN categoria as cat on cat.categoria_id = ca.categoria_id
-        LEFT JOIN nomeacao as n on n.categoria_ano_id = ca.categoria_ano_id
+        JOIN nomeacao as n on n.categoria_ano_id = ca.categoria_ano_id
         LEFT JOIN filme as f on f.filme_id = n.filme_id
-        LEFT JOIN concorre as conc on conc.nomeacao_id = n.nomeacao_id
-        LEFT JOIN nomeado as ne on ne.nomeado_id = conc.nomeado_id
         WHERE ca.categoria_ano_id = ?
         ORDER BY n.ganhou
         """
         , (id,)
     ).fetchall()
     ganhador = nomeacoes[0]
+    nomeados = []
+    for row in nomeacoes:
+        aux1 = []
+        aux2 = []
+        for r in aux:
+            if r['nomeacao_id'] == row['nomeacao_id']:
+                aux1.append(r['nomeado_id'])
+                aux2.append(r['nome'])
+        nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
     suffix = getSuffix(id)
-    return render_template('categoria_ano.html', ganhador=ganhador, nomeacoes=nomeacoes, suffix=suffix)
+    return render_template('categoria_ano.html', ganhador=ganhador, nomeados=nomeados, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
 def filmes():
@@ -213,36 +251,41 @@ def concorre():
 def nomeacao(id):
     nomeacao = db.execute(
         """
-        SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, no.nomeado_id, no.nome AS nomeado_nome, n.filme_id, n.nome, n.ganhou, n.nota, n.detalhe, n.citation, n.multi_filme
+        SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, no.nomeado_id, f.nome as filme_nome, n.filme_id, n.nome, n.ganhou, n.nota, n.detalhe, n.citation, n.multi_filme
         FROM nomeacao AS n
         LEFT JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
         LEFT JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
+        JOIN filme AS f ON f.filme_id = n.filme_id
         JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
         WHERE n.nomeacao_id = ?
         """
-    , (id,)).fetchone()
-    temNome = nomeacao['nome'] != 'nan'
-    temProjeto = nomeacao['filme_id'] != 'nan'
-    temNota = nomeacao['nota'] != 'nan'
-    temDetalhe = nomeacao['detalhe'] != 'nan'
-    temCitation = nomeacao['citation'] != 'nan'
-    temMultiFilme = nomeacao['multi_filme'] != 'nan'
-    return render_template('nomeacao.html', nomeacao=nomeacao, temNome=temNome, temProjeto=temProjeto, temNota=temNota, temDetalhe=temDetalhe, temCitation=temCitation, temMultiFilme=temMultiFilme)
+    , (id,)).fetchall()
+    nomes = getNomes(nomeacao[0]['nome'])
+    temNome = nomeacao[0]['nome'] != 'nan'
+    temProjeto = nomeacao[0]['filme_id'] != 'nan'
+    temNota = nomeacao[0]['nota'] != 'nan'
+    temDetalhe = nomeacao[0]['detalhe'] != 'nan'
+    temCitation = nomeacao[0]['citation'] != 'nan'
+    temMultiFilme = nomeacao[0]['multi_filme'] != 'nan'
+    return render_template('nomeacao.html', nomeacao=nomeacao, nomes=nomes, temNome=temNome, temProjeto=temProjeto, temNota=temNota, temDetalhe=temDetalhe, temCitation=temCitation, temMultiFilme=temMultiFilme)
 
 @APP.route('/nomeacoes/')
 def nomeacoes():
     nomeacoes = db.execute(
         """
-        SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, no.nomeado_id, n.filme_id, f.nome AS filme_nome, n.nome, n.ganhou
+        SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, GROUP_CONCAT(no.nomeado_id) as nomeados_id, n.filme_id, f.nome AS filme_nome, n.nome, n.ganhou
         FROM nomeacao AS n
         JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
         JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
         JOIN filme AS f ON f.filme_id = n.filme_id
         JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
+        GROUP BY n.nomeacao_id
         ORDER BY ca.cerimonia_id ASC
         """
     ).fetchall()
-    return render_template('nomeacoes.html', nomeacoes=nomeacoes)
+    nomeados_id = [row['nomeados_id'].split(',') for row in nomeacoes]
+    nomeados = [row['nome'].split(', ') for row in nomeacoes]
+    return render_template('nomeacoes.html', nomeacoes=nomeacoes, nomeados_id=nomeados_id, nomeados=nomeados)
 
 # ===================================================
 #               QUESTÕES SQL
@@ -368,3 +411,19 @@ def getSuffix(ordNumber: int):
     elif ordNumber != 13 and ordNumber%10 == 3:
         return 'RD'
     return 'TH'
+
+def getNomes(s: str):
+    if ', ' in s:
+        nomes = s.split(', ')
+    elif '; ' in s:
+        nomes = s.split('; ')
+    else: nomes = [s]
+    for i in range(len(nomes)):
+        if ' and ' in nomes[i]:
+            nomes.insert(i+1,nomes[i].split(' and ')[1])
+            nomes[i] = nomes[i].split(' and ')[0]
+    for i in range(len(nomes)):
+        if ': ' in nomes[i]: 
+            nomes[i] = nomes[i][nomes[i].find(': ')+2:]
+
+    return nomes

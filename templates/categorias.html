@@ -19,8 +19,10 @@
         <td>{{ c['classe'] }}</td>
         <td>
             {% for i in range(c['nomes']|length) %}
-            {{ c['nomes'][i] }}
-            <br>
+                {% if i > 0 %}
+                    ,<br>
+                {% endif %}
+                {{ c['nomes'][i] }}
             {% endfor %}
         </td>
         
