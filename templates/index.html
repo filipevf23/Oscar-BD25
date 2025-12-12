@@ -4,18 +4,34 @@
 
 <h1>THE OSCARS DATABASE</h1>
 <p>
-    <a href="{{url_for('cerimonias')}}">CERIMÔNIAS</a>
+    <a class="button" href="{{url_for('cerimonias')}}">CERIMÔNIAS</a>
 </p>
 <p>
-    <a href="{{url_for('filmes')}}">FILMES</a>
+    <a class="button" href="{{url_for('filmes')}}">FILMES</a>
 </p>
 <p>
-    <a href="{{url_for('categorias')}}">CATEGORIAS</a>
+    <a class="button" href="{{url_for('categorias')}}">CATEGORIAS</a>
 </p>
 <p>
-    <a href="{{url_for('nomeados')}}">NOMEADOS</a>
+    <a class="button" href="{{url_for('categorias_ano')}}">CATEGORIAS-ANO</a>
 </p>
 <p>
-    <a href="{{url_for('paises')}}">PAÍSES</a>
+    <a class="button" href="{{url_for('nomeacoes')}}">NOMEAÇÕES</a>
+</p>
+<p>
+    <a class="button" href="{{url_for('nomeados')}}">NOMEADOS</a>
+</p>
+<p>
+    <a class="button" href="{{url_for('concorre')}}">CONCORRE</a>
+</p>
+<h2>QUESTÕES SQL</h2>
+<p>
+    <a class="button" href="{{url_for('paises_mais_premiados')}}">PAÍSES MAIS PREMIADOS</a>
+</p>
+<p>
+    <a class="button" href="{{url_for('filmes_mais_premiados')}}">FILMES MAIS PREMIADOS</a>
+</p>
+<p>
+    <a class="button" href="{{url_for('filmes_perfeitos')}}">FILMES PERFEITOS</a>
 </p>
 {% endblock %}

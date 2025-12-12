@@ -37,7 +37,7 @@ def cerimonias():
 def cerimonia(id):
     cerimonia = db.execute(
         """
-        SELECT cer.cerimonia_id, cer.ano, ca.categoria, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id
+        SELECT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, ne.nomeado_id, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id
         FROM cerimonia AS cer
         JOIN categoria_ano AS ca ON ca.cerimonia_id = cer.cerimonia_id
         JOIN nomeacao AS n ON n.categoria_ano_id = ca.categoria_ano_id
@@ -50,14 +50,7 @@ def cerimonia(id):
         , (id,)
     ).fetchall()
     ano = cerimonia[0]['ano']
-    if id != 11 and id%10 == 1:
-        suffix = 'ST'
-    elif id != 12 and id%10 == 2:
-        suffix = 'ND'
-    elif id != 13 and id%10 == 3:
-        suffix = 'RD'
-    else:
-        suffix = 'TH'
+    suffix = getSuffix(id)
     return render_template('cerimonia.html', cerimonia=cerimonia, id=id, suffix=suffix, ano=ano )
 
 @APP.route('/categorias/')
@@ -77,11 +70,42 @@ def categorias():
         categorias.append({'canonica':row[0], 'classe':row[1], 'nomes':row[2].split(","), 'ano':row[3], 'cerimonia_id':row[4], 'categoria_id':row[5]})
     return render_template('categorias.html', categorias=categorias)
 
-@APP.route('/categoria-ano/<int:id>')
+@APP.route('/categorias/<int:id>')
+def categoria(id):
+    categoria = db.execute(
+        """
+        SELECT c.categoria_id, c.categoria_canonica, ca.categoria, c.classe, ca.categoria_ano_id, cer.cerimonia_id, cer.ano
+        FROM categoria AS c
+        JOIN categoria_ano AS ca ON ca.categoria_id = c.categoria_id
+        JOIN cerimonia AS cer ON cer.cerimonia_id = ca.cerimonia_id
+        WHERE c.categoria_id = ?
+        ORDER BY cer.cerimonia_id ASC
+        """
+    , (id,)).fetchall()
+    categoria_canonica = categoria[0]['categoria_canonica']
+    ano = categoria[0]['ano']
+    classe = categoria[0]['classe']
+    return render_template('categoria.html', categoria=categoria, categoria_canonica=categoria_canonica, classe=classe, ano=ano)
+
+@APP.route('/categorias-ano/')
+def categorias_ano():
+    categorias_ano = db.execute(
+        """
+        SELECT cat.categoria_canonica, ca.categoria, ca.categoria_ano_id, cer.cerimonia_id, cat.categoria_id
+        FROM cerimonia as cer
+        JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
+        JOIN categoria as cat on cat.categoria_id = ca.categoria_id
+        ORDER BY cer.cerimonia_id DESC, ca.categoria ASC
+        """
+    ).fetchall()
+    suffixes = [getSuffix(row['cerimonia_id']) for row in categorias_ano]
+    return render_template('categorias_ano.html', categorias_ano=categorias_ano, suffixes=suffixes)
+
+@APP.route('/categorias-ano/<int:id>')
 def categoria_ano(id):
     nomeacoes = db.execute(
         """
-        SELECT cat.categoria_canonica, ca.categoria, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
+        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, ne.nomeado_id, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
         FROM cerimonia as cer
         JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
         JOIN categoria as cat on cat.categoria_id = ca.categoria_id
@@ -95,15 +119,7 @@ def categoria_ano(id):
         , (id,)
     ).fetchall()
     ganhador = nomeacoes[0]
-    ano = ganhador['ano']
-    if id != 11 and id%10 == 1:
-        suffix = 'ST'
-    elif id != 12 and id%10 == 2:
-        suffix = 'ND'
-    elif id != 13 and id%10 == 3:
-        suffix = 'RD'
-    else:
-        suffix = 'TH'
+    suffix = getSuffix(id)
     return render_template('categoria_ano.html', ganhador=ganhador, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
@@ -137,14 +153,7 @@ def filme(id):
     fnome = filme[0]['nome']
     cerimonia = filme[0]['cerimonia_id']
     ano = filme[0]['ano']
-    if cerimonia != 11 and cerimonia%10 == 1:
-        suffix = 'ST'
-    elif cerimonia != 12 and cerimonia%10 == 2:
-        suffix = 'ND'
-    elif cerimonia != 13 and cerimonia%10 == 3:
-        suffix = 'RD'
-    else:
-        suffix = 'TH'
+    suffix = getSuffix(cerimonia)
     return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia, suffix=suffix)
 
 
@@ -174,7 +183,7 @@ def nomeado(id):
         , (id,) ).fetchone()
     nomeacoes = db.execute(
         """
-        SELECT ca.categoria, ca.categoria_ano_id, f.nome AS filme_nome, f.filme_id, cer.ano, cer.cerimonia_id
+        SELECT n.nomeacao_id, ca.categoria, ca.categoria_ano_id, f.nome AS filme_nome, f.filme_id, cer.ano, cer.cerimonia_id
         FROM nomeacao AS n
         JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
         JOIN cerimonia AS cer ON cer.cerimonia_id = ca.cerimonia_id
@@ -187,8 +196,59 @@ def nomeado(id):
 
     return render_template('nomeado.html', nomeado=nomeado, nomeacoes=nomeacoes)
 
-@APP.route('/paises/')
-def paises():
+@APP.route('/concorre/')
+def concorre():
+    aux = db.execute(
+        """
+        SELECT c.nomeacao_id, c.nomeado_id
+        FROM concorre AS c
+        ORDER BY c.nomeacao_id DESC
+        """
+    ).fetchall()
+    concorre = [{'nomeacao_id':x, 'nomeado_id':y, 'nomeado_id_list':y.split(',')} for x,y in aux]
+    return render_template('concorre.html', concorre=concorre)
+
+@APP.route('/nomeacoes/<id>')
+def nomeacao(id):
+    nomeacao = db.execute(
+        """
+        SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, no.nomeado_id, no.nome AS nomeado_nome, n.filme_id, n.nome, n.ganhou, n.nota, n.detalhe, n.citation, n.multi_filme
+        FROM nomeacao AS n
+        JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
+        JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
+        JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
+        WHERE n.nomeacao_id = ?
+        """
+    , (id,)).fetchone()
+    temNome = nomeacao['nome'] != 'nan'
+    temProjeto = nomeacao['filme_id'] != 'nan'
+    temNota = nomeacao['nota'] != 'nan'
+    temDetalhe = nomeacao['detalhe'] != 'nan'
+    temCitation = nomeacao['citation'] != 'nan'
+    temMultiFilme = nomeacao['multi_filme'] != 'nan'
+    return render_template('nomeacao.html', nomeacao=nomeacao, temNome=temNome, temProjeto=temProjeto, temNota=temNota, temDetalhe=temDetalhe, temCitation=temCitation, temMultiFilme=temMultiFilme)
+
+@APP.route('/nomeacoes/')
+def nomeacoes():
+    nomeacoes = db.execute(
+        """
+        SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, no.nomeado_id, n.filme_id, f.nome AS filme_nome, n.nome, n.ganhou
+        FROM nomeacao AS n
+        JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
+        JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
+        JOIN filme AS f ON f.filme_id = n.filme_id
+        JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
+        ORDER BY ca.cerimonia_id ASC
+        """
+    ).fetchall()
+    return render_template('nomeacoes.html', nomeacoes=nomeacoes)
+
+# ===================================================
+#               QUESTÕES SQL
+# ===================================================
+
+@APP.route('/paises-mais-premiados/')
+def paises_mais_premiados():
     aux = db.execute("""
         with vit as (
         select no.nome as Pais,ca.cerimonia_id as id, count(f.nome) as Vitorias
@@ -233,7 +293,7 @@ def paises():
                 if exists: break
             if not exists:
                 paises.append(p)
-    return render_template('paises.html',paises = paises)
+    return render_template('paises-mais-premiados.html',paises = paises)
 
 @APP.route('/paises/<id>')
 def pais(id):
@@ -251,16 +311,59 @@ def pais(id):
     nome = pais[0]['Pais']
     return render_template('pais.html',pais = pais,nome=nome)
 
-@APP.route('/categorias/<int:id>')
-def categoria(id):
-    categoria = db.execute(
+@APP.route('/filmes-mais-premiados/')
+def filmes_mais_premiados():
+    filmes = db.execute(
         """
-        SELECT c.categoria_id, c.categoria_canonica, ca.categoria, c.classe, ca.categoria_ano_id, cer.ano
-        FROM categoria AS c
-        JOIN categoria_ano AS ca ON ca.categoria_id = c.categoria_id
-        JOIN cerimonia AS cer ON cer.cerimonia_id = ca.cerimonia_id
-        WHERE c.categoria_id = ?
-        ORDER BY cer.cerimonia_id ASC
+        WITH t1 AS (
+            SELECT f.filme_id as filme_id, COUNT(n.filme_id) as vitorias
+            FROM filme AS f 
+            JOIN nomeacao AS n ON n.filme_id = f.filme_id
+            WHERE n.ganhou = '1.0'
+            GROUP BY f.filme_id
+        )
+        SELECT f.filme_id, f.nome, t1.vitorias, COUNT(n.filme_id) AS nomeacoes
+        FROM filme AS f 
+        JOIN nomeacao AS n ON n.filme_id = f.filme_id
+        JOIN t1 ON t1.filme_id = f.filme_id
+        GROUP BY f.filme_id, f.nome, t1.vitorias
+        HAVING t1.vitorias > 1
+        ORDER BY t1.vitorias DESC, nomeacoes DESC
         """
-    , (id,)).fetchall()
-    return render_template('categoria.html', categoria=categoria)
+    ).fetchall()
+    return render_template('filmes-mais-premiados.html', filmes=filmes)
+
+@APP.route('/filmes-perfeitos/')
+def filmes_perfeitos():
+    filmes = db.execute(
+        """
+        WITH t1 AS (
+            SELECT f.filme_id as filme_id, COUNT(n.filme_id) as vitorias
+            FROM filme AS f 
+            JOIN nomeacao AS n ON n.filme_id = f.filme_id
+            WHERE n.ganhou = '1.0'
+            GROUP BY f.filme_id
+        )
+        SELECT f.filme_id, f.nome, t1.vitorias, COUNT(n.filme_id) AS nomeacoes
+        FROM filme AS f 
+        JOIN nomeacao AS n ON n.filme_id = f.filme_id
+        JOIN t1 ON t1.filme_id = f.filme_id
+        GROUP BY f.filme_id, f.nome, t1.vitorias
+        HAVING t1.vitorias = nomeacoes AND nomeacoes > 2
+        ORDER BY t1.vitorias DESC, nomeacoes DESC
+        """
+    ).fetchall()
+    return render_template('filmes-perfeitos.html', filmes=filmes)
+
+# ======================================
+# FUNÇÕES AUXILIARES
+# ======================================
+
+def getSuffix(ordNumber: int):
+    if ordNumber != 11 and ordNumber%10 == 1:
+        return 'ST'
+    elif ordNumber != 12 and ordNumber%10 == 2:
+        return 'ND'
+    elif ordNumber != 13 and ordNumber%10 == 3:
+        return 'RD'
+    return 'TH'

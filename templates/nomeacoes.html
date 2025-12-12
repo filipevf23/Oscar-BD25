@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>NOMEAÇÕES</h1>
+
+<table>
+    <tr>
+        <th>
+            ID
+        </th>
+        <th>
+            Categoria-Ano
+        </th>
+        <th>
+            Nome
+        </th>
+        <th>
+            Filme
+        </th>
+        <th>
+            Ganhou
+        </th>
+    </tr>
+
+    {% for n in nomeacoes %}
+
+    <tr>
+        <td>
+            <a href="{{ url_for('nomeacao', id=n.nomeacao_id) }}">{{ n.nomeacao_id }}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('categoria_ano', id=n.categoria_ano_id) }}">{{ n.categoria }}</a>
+        </td>
+        <td>
+        {% if n.nome != 'nan' %}
+            <a href="{{url_for('nomeado', id=n.nomeado_id)}}">{{ n.nome }}</a>
+        {% else %}
+            -
+        {% endif %}
+        </td>
+        <td>
+            <a href="{{ url_for('filme', id=n.filme_id) }}">{{ n.filme_nome }}</a>
+        </td>
+        <td>
+            {% if n.ganhou != 'nan' %}
+            Ganhou
+            {% else %}
+            Perdeu
+            {% endif %}
+        </td>
+    </tr>   
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

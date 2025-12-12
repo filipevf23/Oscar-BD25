@@ -1,11 +1,5 @@
 {% extends 'base.html' %}
 
-{% block header_nav %}
-<p>
-    <a href="{{url_for('cerimonia', id=ganhador.cerimonia_id)}}">BACK</a>
-</p>
-{% endblock %}
-
 {% block content %}
 
 <h1>Categoria: {{ ganhador.categoria }}</h1>
@@ -15,14 +9,22 @@
 </p>
 
 
-<h2>Ganhador: {{ ganhador.nome }} ({{ ganhador.filme_nome}})</h2>
+<h2>
+    Ganhador: <a href="{{url_for('nomeado', id=ganhador.nomeado_id)}}">{{ ganhador.nome }}</a> (<a href="{{url_for('filme', id=ganhador.filme_id)}}">{{ ganhador.filme_nome }}</a>)
+</h2>
 
-<h3>Nomeados:</h3>
-
+<table>
+    <tr>
+        <th>Nomeações</th>
+    </tr>
     {% for n in nomeacoes %}
-
-        <p>{{ n.nome }} ({{ n.filme_nome }})</p>
-
+    <tr>
+        <td>
+            <a href="{{url_for('nomeacao', id=n.nomeacao_id)}}">{{ n.nome }} ({{ n.filme_nome }})</a> 
+        </td>
+    </tr>
     {% endfor %}
+</table>
+    
 
 {% endblock %}

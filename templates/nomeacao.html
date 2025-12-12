@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>NOMEAÇÃO</h1>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <td>{{nomeacao.nomeacao_id}}</td>
+    </tr>
+
+    {% if temNome %}
+    <tr>
+        <th>Nome</th>
+        <td>{{nomeacao.nome}}</td>
+    </tr>
+    {% endif %}
+
+    <tr>
+        <th>Nomeado</th>
+        <td><a href="{{url_for('nomeado', id=nomeacao.nomeado_id)}}">{{nomeacao.nomeado_nome}}</a></td>
+    </tr>
+
+    {% if temProjeto %}
+    <tr>
+        <th>Filme</th>
+        <td><a href="{{url_for('filme', id=nomeacao.filme_id)}}">{{nomeacao.filme_id}}</a></td>
+    </tr>
+    {% endif %}
+
+    {% if temNota %}
+    <tr>
+        <th>Nota</th>
+        <td> {{nomeacao.nota}}</td>
+    </tr>
+    {% endif %}
+
+    {% if temDetalhe %}
+    <tr>
+        <th>Detalhe</th>
+        <td>{{nomeacao.detalhe}}</td>
+    </tr>
+    {% endif %}
+
+    {% if temCitation %}
+    <tr>
+        <th>Citação</th>
+        <td>{{nomeacao.citation}}</td>
+    </tr>
+    {% endif %}
+
+    {% if temMultiFilme %}
+    <tr>
+        <th>Multi-Filme</th>
+        <td>Verdadeiro</td>
+    </tr>
+    {% endif %}
+</table>
+    
+{% endblock %}

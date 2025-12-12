@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>LISTA CATEGORIAS-ANO</h1>
+
+<table>
+    <tr>
+        <th>Nome</th>
+        <th>Cerimônia</th>
+        <th>Categoria Canônica</th>
+    </tr>
+    {% for i in range(categorias_ano|length) %}
+    <tr>
+        <td><a href="{{url_for('categoria_ano', id=categorias_ano[i].categoria_ano_id)}}">{{ categorias_ano[i].categoria }}</a></td>
+        <td><a href="{{url_for('cerimonia', id=categorias_ano[i].cerimonia_id)}}">{{ categorias_ano[i].cerimonia_id }}{{suffixes[i]}}</a></td>
+        <td><a href="{{url_for('categoria', id=categorias_ano[i].categoria_id)}}">{{ categorias_ano[i].categoria_canonica }}</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

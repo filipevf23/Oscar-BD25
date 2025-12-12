@@ -1,17 +1,14 @@
 {% extends 'base.html' %}
 
-{% block header_nav %}
-<p>
-    <a href="{{url_for('categorias')}}">BACK</a>
-</p>
-    
-{% endblock %}
 
 {% block content %}
-
-<h1>{{ categoria[0].categoria_canonica }}</h1>
-<h2>Classe: {{categoria[0].classe}}</h2>
-<h2>Adicionada em {{ categoria[0].ano }}</h2>
+<h1>CATEGORIA CANÔNICA</h1>
+<h2>{{ categoria_canonica }}</h2>
+<h3>
+    Classe: {{ classe }}
+    <br>
+    Adicionada em {{ ano }}
+</h3>
 
 <table>
     <tr>
@@ -27,10 +24,10 @@
 
     <tr>
         <td>
-        <a href="{{ url_for('categoria_ano', id=c.categoria_ano_id) }}">{{ c.categoria }}</a>
+            <a href="{{ url_for('categoria_ano', id=c.categoria_ano_id) }}">{{ c.categoria }}</a>
         </td>
         <td>
-            {{ c.ano }}
+            <a href="{{ url_for('cerimonia', id=c.cerimonia_id) }}">{{ c.ano }}</a>
         </td>
     </tr>   
 

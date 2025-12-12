@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>TABELA CONCORRE</h1>
+<table>
+    <tr>
+        <th>ID da Nomeação</th>
+        <th>ID do Nomeado</th>
+    </tr>
+    {% for c in concorre %}
+    <tr>
+        <td>
+            <a href="{{url_for('nomeacao', id=c['nomeacao_id'])}}"> {{ c['nomeacao_id'] }} </a>
+        </td>
+        <td>
+            {% for i in range(c['nomeado_id_list']|length) %}
+            <a href="{{url_for('nomeado', id=c['nomeado_id'])}}"> {{ c['nomeado_id_list'][i] }} </a>
+            <br>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>FILMES MAIS PREMIADOS</h1>
+<table>
+    <tr>
+        <th>Filme</th>
+        <th>Vitorias</th>
+        <th>Nomeações</th>
+    </tr>
+    {% for f in filmes %}
+    <tr>
+        <td><a href="{{url_for('filme', id=f.filme_id)}}">{{ f.nome }}</a></td>
+        <td>{{ f.vitorias }}</td>
+        <td>{{ f.nomeacoes }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

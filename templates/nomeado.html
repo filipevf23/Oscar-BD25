@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a href="{{url_for('nomeados')}}">BACK</a>
 
 <h1> {{nomeado.nome }} </h1>
 
 <table>
     <tr>
         <th>Nomeação</th>
+        <th>Categoria</th>
         <th>Projeto</th>
         <th>Ano</th>
     </tr>
     {% for n in nomeacoes %}
     <tr>
+        <td><a href="{{ url_for('nomeacao', id=n.nomeacao_id) }}">{{ n.nomeacao_id }}</a></td>
         <td><a href="{{ url_for('categoria', id=n.categoria_ano_id) }}">{{ n.categoria }}</a></td>
         <td><a href="{{ url_for('filme', id=n.filme_id) }}">{{ n.filme_nome }}</a></td>
         <td><a href="{{ url_for('cerimonia', id=n.cerimonia_id) }}">{{ n.ano }}</a></td>

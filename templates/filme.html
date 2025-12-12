@@ -23,7 +23,7 @@
     {% for f in filme %}
     <tr>
         <td>
-            <a href="{{ url_for('categoria', id=f.categoria_ano_id) }}">{{ f.categoria }}</a>
+            <a href="{{ url_for('categoria_ano', id=f.categoria_ano_id) }}">{{ f.categoria }}</a>
         </td>
         <td>
             {% if f.nomeado_id %}
