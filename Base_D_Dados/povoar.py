@@ -58,20 +58,40 @@ for _, row in df_filme.iterrows():
         VALUES (?,?)
     """, (id,nome,))  
 
-#Nomeado 
-for j,row in df.iterrows():
-    #Confere se existe nomeado e id, se falta id cria, se não tem nenhum ignora
+#Nomeado
+for j, row in df.iterrows():
+
+    # Se não tem nenhum nomeado, pula
     if pd.isna(row['Nominees']) and pd.isna(row['NomineeIds']):
         continue
-    elif pd.isna(row['NomineeIds']):
-        id = f"nn{row['Ceremony']}{j}"
+
+    # separa nomes
+    nomes = str(row['Nominees']).split(',')
+    nomes = [n.strip() for n in nomes]
+
+    # separa ids
+    if pd.isna(row['NomineeIds']):
+        ids = ['?'] * len(nomes)   # todos precisam ser criados
     else:
-        id = str(row['NomineeIds'])
-    nome = str(row['Nominees'])
-    cur.execute("""
-        INSERT OR IGNORE INTO nomeado (nomeado_id,nome)
-        VALUES (?,?)
-        """,(id,nome))
+        ids_raw = str(row['NomineeIds']).split(',')
+        ids_raw = [x.strip() for x in ids_raw]
+
+        while len(ids_raw) < len(nomes):
+            ids_raw.append('?')
+        ids = ids_raw
+
+    for idx, (nome, rid) in enumerate(zip(nomes, ids)):
+        
+        # gera ID se for '?'
+        if rid == '?':
+            rid = f"nn{row['Ceremony']}{j}{idx}"
+
+        # insere individualmente
+        cur.execute("""
+            INSERT OR IGNORE INTO nomeado (nomeado_id, nome)
+            VALUES (?, ?)
+        """, (rid, nome))
+
     
 #Categoria_Ano   
 df_catAno = df[['Category','Class','CanonicalCategory','Ceremony']].drop_duplicates()
@@ -94,56 +114,79 @@ for _,row in df_catAno.iterrows():
         """,(categoria,categoria_id,cerimonia_id))    
 
 #Nomeação 
-for _,row in df.iterrows():
-    #Confere se existe nomeacao e id, se falta id cria, se não tem nenhum ignora
-    if pd.isna(row['NomId']): 
+for j, row in df.iterrows():
+
+    # Cria ID se estiver vazio
+    if pd.isna(row['NomId']):
         id = f"anw{row['Ceremony']}{j}"
     else:
         id = str(row['NomId'])
+
     filme = str(row['FilmId'])
     nome = str(row['Name'])
-    winner =  str(row['Winner']) 
+    winner = str(row['Winner'])
     detail = str(row['Detail'])
     note = str(row['Note'])
     citation = str(row['Citation'])
     mf = str(row['MultifilmNomination'])
-    #Para pegar os Ids corretos:
+
     categoria = str(row['Category'])
     cerimonia_id = int(row['Ceremony'])
 
     cur.execute("""
-        Select categoria_ano_id
-        from categoria_ano
-        where categoria = ? AND cerimonia_id = ?
-        """,(categoria,cerimonia_id))
+        SELECT categoria_ano_id
+        FROM categoria_ano
+        WHERE categoria = ? AND cerimonia_id = ?
+    """, (categoria, cerimonia_id))
+
     categoria_ano_id = cur.fetchone()[0]
 
     cur.execute("""
-        INSERT OR IGNORE INTO nomeacao (nomeacao_id,categoria_ano_id
-                ,filme_id,nome,ganhou,nota,detalhe,citation,multi_filme)
-        VALUES (?,?,?,?,?,?,?,?,?)
-    """,(id,categoria_ano_id,filme,nome,winner,note,detail,citation,mf))
+        INSERT OR IGNORE INTO nomeacao 
+            (nomeacao_id, categoria_ano_id, filme_id, nome, ganhou, nota, detalhe, citation, multi_filme)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (id, categoria_ano_id, filme, nome, winner, note, detail, citation, mf))
+
 
 #Concorre
 for j, row in df.iterrows():
-    #Basicamente faz o mesmo em nomeado e nomeação, os que não existem cria o mesmo
-    #e como está pegando por linha vai ser necessariamente a mesma ligação
-    if pd.isna(row['NomineeIds']) and pd.notna(row['Nominees']):
-        nomeado_id = f"nn{row['Ceremony']}{j}"
-    elif pd.notna(row['NomineeIds']):
-        nomeado_id = str(row['NomineeIds'])
-    else:
-        continue  
 
+    #Caso não exista nomeado
+    if pd.isna(row['Nominees']) and pd.isna(row['NomineeIds']):
+        continue
+
+    #separar nomes
+    nomes = str(row['Nominees']).split(',')
+    nomes = [n.strip() for n in nomes]
+
+    # separa ids
+    if pd.isna(row['NomineeIds']):
+        ids = ['?'] * len(nomes)
+    else:
+        ids_raw = str(row['NomineeIds']).split(',')
+        ids_raw = [i.strip() for i in ids_raw]
+        while len(ids_raw) < len(nomes):
+            ids_raw.append('?')
+        ids = ids_raw
+
+    # id da nomeação
     if pd.isna(row['NomId']):
-        nomeacao_id =  f"anw{row['Ceremony']}{j}"
+        nomeacao_id = f"anw{row['Ceremony']}{j}"
     else:
         nomeacao_id = str(row['NomId'])
 
-    cur.execute("""
-        INSERT OR IGNORE INTO concorre(nomeado_id, nomeacao_id)
-        VALUES (?, ?)
-    """, (nomeado_id, nomeacao_id))
+    # insere cada ligação individualmente
+    for idx, rid in enumerate(ids):
+
+        # se o ID for ?, gerar o mesmo ID que foi criado em nomeado
+        if rid == '?':
+            rid = f"nn{row['Ceremony']}{j}{idx}"
+
+        cur.execute("""
+            INSERT OR IGNORE INTO concorre (nomeado_id, nomeacao_id)
+            VALUES (?, ?)
+        """, (rid, nomeacao_id))
+
 
 
 # Salva alterações e fecha
