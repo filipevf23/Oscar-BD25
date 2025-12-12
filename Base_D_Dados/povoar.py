@@ -66,13 +66,14 @@ for j, row in df.iterrows():
         continue
 
     # separa nomes
-    nomes = str(row['Nominees']).split(',')
+    nomes = str(row['Nominees']).split(',') 
     nomes = [n.strip() for n in nomes]
 
     # separa ids
     if pd.isna(row['NomineeIds']):
-        ids = ['?'] * len(nomes)   # todos precisam ser criados
+        ids = ['?'] * len(nomes)   
     else:
+        
         ids_raw = str(row['NomineeIds']).split(',')
         ids_raw = [x.strip() for x in ids_raw]
 
@@ -156,7 +157,7 @@ for j, row in df.iterrows():
         continue
 
     #separar nomes
-    nomes = str(row['Nominees']).split(',')
+    nomes = str(row['Nominees']).split(',') 
     nomes = [n.strip() for n in nomes]
 
     # separa ids
