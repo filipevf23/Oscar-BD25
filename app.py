@@ -105,14 +105,15 @@ def categorias_ano():
 def categoria_ano(id):
     nomeacoes = db.execute(
         """
-        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, ne.nomeado_id, f.nome AS filme_nome, ne.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
+        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, ne.nomeado_id, f.nome AS filme_nome, 
+               ne.nome, n.nome as pais, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
         FROM cerimonia as cer
         JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
         JOIN categoria as cat on cat.categoria_id = ca.categoria_id
-        JOIN nomeacao as n on n.categoria_ano_id = ca.categoria_ano_id
-        JOIN filme as f on f.filme_id = n.filme_id
-        JOIN concorre as conc on conc.nomeacao_id = n.nomeacao_id
-        JOIN nomeado as ne on ne.nomeado_id = conc.nomeado_id
+        LEFT JOIN nomeacao as n on n.categoria_ano_id = ca.categoria_ano_id
+        LEFT JOIN filme as f on f.filme_id = n.filme_id
+        LEFT JOIN concorre as conc on conc.nomeacao_id = n.nomeacao_id
+        LEFT JOIN nomeado as ne on ne.nomeado_id = conc.nomeado_id
         WHERE ca.categoria_ano_id = ?
         ORDER BY n.ganhou
         """
@@ -138,7 +139,7 @@ def filmes():
 @APP.route('/filmes/<id>/')
 def filme(id):
     filme = db.execute(""" 
-        select f.nome as nome,c.cerimonia_id as cerimonia_id,c.ano as ano,ano.categoria as categoria,
+        select f.nome as nome,c.cerimonia_id as cerimonia_id, c.ano as ano,ano.categoria as categoria,
                        p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id,
                        p.nomeado_id as nomeado_id,n.nome as nomeacao
         from filme f
@@ -214,8 +215,8 @@ def nomeacao(id):
         """
         SELECT n.nomeacao_id, n.categoria_ano_id, ca.categoria, no.nomeado_id, no.nome AS nomeado_nome, n.filme_id, n.nome, n.ganhou, n.nota, n.detalhe, n.citation, n.multi_filme
         FROM nomeacao AS n
-        JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
-        JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
+        LEFT JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
+        LEFT JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
         JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
         WHERE n.nomeacao_id = ?
         """

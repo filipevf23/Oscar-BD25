@@ -10,7 +10,13 @@
 
 
 <h2>
-    Ganhador: <a href="{{url_for('nomeado', id=ganhador.nomeado_id)}}">{{ ganhador.nome }}</a> (<a href="{{url_for('filme', id=ganhador.filme_id)}}">{{ ganhador.filme_nome }}</a>)
+    Ganhador: 
+        {% if ganhador.nomeado_id %}
+        <a href="{{url_for('nomeado', id=ganhador.nomeado_id)}}">{{ ganhador.nome }}</a>
+        {% else %}
+        <a href="{{url_for('pais', id=ganhador.pais)}}">{{ ganhador.pais }}</a>
+        {% endif %}
+         (<a href="{{url_for('filme', id=ganhador.filme_id)}}">{{ ganhador.filme_nome }}</a>)
 </h2>
 
 <table>
@@ -20,7 +26,13 @@
     {% for n in nomeacoes %}
     <tr>
         <td>
-            <a href="{{url_for('nomeacao', id=n.nomeacao_id)}}">{{ n.nome }} ({{ n.filme_nome }})</a> 
+            <a href="{{url_for('nomeacao', id=n.nomeacao_id)}}">
+                {% if ganhador.nomeado_id %}
+                {{ n.nome }} ({{ n.filme_nome }})
+                {% else %}
+                {{ n.pais }} ({{ n.filme_nome }})
+                {% endif %}
+            </a> 
         </td>
     </tr>
     {% endfor %}

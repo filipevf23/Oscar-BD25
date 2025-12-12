@@ -19,7 +19,13 @@
 
     <tr>
         <th>Nomeado</th>
-        <td><a href="{{url_for('nomeado', id=nomeacao.nomeado_id)}}">{{nomeacao.nomeado_nome}}</a></td>
+        <td>
+            {% if nomeacao.nomeado_id %}
+            <a href="{{url_for('nomeado', id=nomeacao.nomeado_id)}}">{{nomeacao.nomeado_nome}}</a>
+            {% else %}
+            <a href="{{url_for('pais', id=nomeacao.nome)}}">{{nomeacao.nome}}</a>
+            {% endif %}
+        </td>
     </tr>
 
     {% if temProjeto %}
