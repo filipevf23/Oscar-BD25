@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>PARES MAIOR-MENOR NOME DE FILME</h1>
+<table>
+    <tr>
+        <th>Tamanho Maior</th>
+        <th>Par</th>
+        <th>Tamanho Menor</th>
+    </tr>
+    {% for n in nomes %}
+    <tr>
+        <td>{{ n.tamanho_longo }}</td>
+        <td>
+            (<a href="{{url_for('filme', id=n.filme_longo_id)}}">{{ n.filme_longo }}</a> &
+            <a href="{{url_for('filme', id=n.filme_curto_id)}}">{{ n.filme_curto }}</a>)
+        </td>
+        <td>{{ n.tamanho_curto }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

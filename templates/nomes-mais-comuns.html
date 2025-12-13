@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>NOMES MAIS COMUNS</h1>
+<table>
+    <tr>
+        <th>Nome</th>
+        <th>Quantidade</th>
+    </tr>
+    {% for n in nomes %}
+    <tr>
+        <td>{{ n.pnome }}</td>
+        <td>{{ n.vezes }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

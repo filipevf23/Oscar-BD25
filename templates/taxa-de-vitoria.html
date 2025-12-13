@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>TAXA DE VITÓRIA</h1>
+<h3>DAS ENTIDADES NOMEADAS MAIS DE UMA VEZ</h3>
+<table>
+    <tr>
+        <th>Nomeado</th>
+        <th>Vitórias</th>
+        <th>Nomeações</th>
+        <th>Taxa de Vitória</th>
+    </tr>
+    {% for n in nomeados %}
+    <tr>
+        <td><a href="{{url_for('nomeado', id=n.id)}}">{{ n.nome }}</a></td>
+        <td>{{ n.vit }}</td>
+        <td>{{ n.nomeacoes }}</td>
+        <td>{{ n.taxa_vitoria }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

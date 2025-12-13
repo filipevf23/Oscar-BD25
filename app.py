@@ -37,10 +37,11 @@ def cerimonias():
 def cerimonia(id):
     aux = db.execute(
         """
-        SELECT ca.categoria_ano_id, no.nomeado_id, no.nome
+        SELECT DISTINCT ca.categoria_ano_id, no.nomeado_id, no.nome, f.filme_id, f.nome as filme_nome
         FROM nomeacao n
         JOIN concorre c on c.nomeacao_id = n.nomeacao_id
         JOIN nomeado no on no.nomeado_id = c.nomeado_id
+        JOIN filme f on f.filme_id = n.filme_id
         JOIN categoria_ano ca ON ca.categoria_ano_id = n.categoria_ano_id
         WHERE ca.cerimonia_id = ?
         AND n.ganhou = '1.0'
@@ -48,12 +49,10 @@ def cerimonia(id):
     , (id,)).fetchall()
     cerimonia = db.execute(
         """
-        SELECT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, n.nome, f.nome AS filme_nome, ca.categoria_ano_id
+        SELECT DISTINCT cer.cerimonia_id, cer.ano, ca.categoria, n.nome, ca.categoria_ano_id
         FROM cerimonia AS cer
         JOIN categoria_ano AS ca ON ca.cerimonia_id = cer.cerimonia_id
         JOIN nomeacao AS n ON n.categoria_ano_id = ca.categoria_ano_id
-        LEFT JOIN filme AS f ON f.filme_id = n.filme_id
-        LEFT JOIN concorre AS conc ON conc.nomeacao_id = n.nomeacao_id
         WHERE n.ganhou = '1.0'
         AND cer.cerimonia_id = ?
         ORDER BY ca.categoria
@@ -65,11 +64,16 @@ def cerimonia(id):
     for row in cerimonia:
         aux1 = []
         aux2 = []
+        aux3 = []
+        aux4 = []
         for r in aux:
             if r['categoria_ano_id'] == row['categoria_ano_id']:
-                aux1.append(r['nomeado_id'])
-                aux2.append(r['nome'])
-        nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
+                if r['nomeado_id'] not in aux1 and r['nome'] not in aux2:
+                    aux1.append(r['nomeado_id'])
+                    aux2.append(r['nome'])
+                aux3.append(r['filme_id'])
+                aux4.append(r['filme_nome'])
+        nomeados.append({'nomeados_id':aux1, 'nomes':aux2, 'filmes_id':aux3, 'filme_nomes':aux4})
     for i in nomeados:
         print(i)
     suffix = getSuffix(id)
@@ -148,7 +152,21 @@ def categoria_ano(id):
         """
         , (id,)
     ).fetchall()
-    ganhador = nomeacoes[0]
+    ganhador = db.execute(
+        """
+        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, f.nome AS filme_nome, 
+                n.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
+        FROM cerimonia as cer
+        JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
+        JOIN categoria as cat on cat.categoria_id = ca.categoria_id
+        JOIN nomeacao as n on n.categoria_ano_id = ca.categoria_ano_id
+        LEFT JOIN filme as f on f.filme_id = n.filme_id
+        WHERE ca.categoria_ano_id = ?
+        AND ganhou = '1.0'
+        ORDER BY n.ganhou
+        """
+        , (id,)
+    ).fetchall()
     nomeados = []
     for row in nomeacoes:
         aux1 = []
@@ -158,7 +176,7 @@ def categoria_ano(id):
                 aux1.append(r['nomeado_id'])
                 aux2.append(r['nome'])
         nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
-    suffix = getSuffix(id)
+    suffix = getSuffix(nomeacoes[0]['cerimonia_id'])
     return render_template('categoria_ano.html', ganhador=ganhador, nomeados=nomeados, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
@@ -176,24 +194,40 @@ def filmes():
 
 @APP.route('/filmes/<id>/')
 def filme(id):
+    aux = db.execute(
+        """
+        SELECT f.filme_id, no.nomeado_id, no.nome
+        FROM nomeacao n
+        JOIN concorre c on c.nomeacao_id = n.nomeacao_id
+        JOIN nomeado no on no.nomeado_id = c.nomeado_id
+        JOIN filme as f on f.filme_id = n.filme_id
+        WHERE f.filme_id = ?
+        """
+    , (id,)).fetchall()
     filme = db.execute(""" 
-        select f.nome as nome,c.cerimonia_id as cerimonia_id, c.ano as ano,ano.categoria as categoria,
-                       p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id,
-                       p.nomeado_id as nomeado_id,n.nome as nomeacao
+        select f.nome as filme_nome, f.filme_id, c.cerimonia_id as cerimonia_id, c.ano as ano,ano.categoria as categoria,
+                       n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id, n.nome
         from filme f
         join nomeacao n on n.filme_id=f.filme_id
         join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
         join cerimonia c on c.cerimonia_id=ano.cerimonia_id
-        left join concorre con on con.nomeacao_id=n.nomeacao_id
-        left join nomeado p on p.nomeado_id=con.nomeado_id
         where f.filme_id = ?
         Order by n.ganhou;
         """,(id,)).fetchall()
-    fnome = filme[0]['nome']
+    fnome = filme[0]['filme_nome']
     cerimonia = filme[0]['cerimonia_id']
+    nomeados = []
+    for row in filme:
+        aux1 = []
+        aux2 = []
+        for r in aux:
+            if r['filme_id'] == row['filme_id']:
+                aux1.append(r['nomeado_id'])
+                aux2.append(r['nome'])
+        nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
     ano = filme[0]['ano']
     suffix = getSuffix(cerimonia)
-    return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia, suffix=suffix)
+    return render_template('filme.html',filme=filme,fnome=fnome, nomeados=nomeados, ano=ano,cerimonia=cerimonia, suffix=suffix)
 
 
 @APP.route('/nomeados/')
@@ -398,6 +432,185 @@ def filmes_perfeitos():
         """
     ).fetchall()
     return render_template('filmes-perfeitos.html', filmes=filmes)
+
+@APP.route('/empresas-mais-nomeadas/')
+def empresas_mais_nomeadas():
+    empresas = db.execute(
+        """
+        with vitorias as (
+            SELECT no.nomeado_id as id, COUNT(*) AS vit
+            FROM concorre c
+                JOIN nomeado no ON no.nomeado_id = c.nomeado_id
+                join nomeacao m on m.nomeacao_id=c.nomeacao_id
+                where c.nomeado_id like 'co%'
+                AND m.ganhou = '1.0'
+                GROUP BY id
+        )
+
+        SELECT no.nome, COUNT(*) AS nomeacoes, v.vit, no.nomeado_id as id
+        FROM concorre c
+        JOIN nomeado no ON no.nomeado_id = c.nomeado_id
+        JOIN nomeacao m on m.nomeacao_id=c.nomeacao_id
+        JOIN vitorias as v on v.id = no.nomeado_id
+        where c.nomeado_id like 'co%'
+        GROUP BY no.nomeado_id
+        ORDER BY nomeacoes DESC, vit DESC
+        Limit 20;
+        """
+    ).fetchall()
+    return render_template('empresas-mais-nomeadas.html', empresas=empresas)
+
+@APP.route('/taxa-de-vitoria/')
+def taxa_de_vitoria():
+    nomeados = db.execute(
+        """
+        with vitorias as (
+            SELECT no.nomeado_id as id, COUNT(*) AS vit
+            FROM concorre c
+                JOIN nomeado no ON no.nomeado_id = c.nomeado_id
+                join nomeacao m on m.nomeacao_id=c.nomeacao_id
+                AND m.ganhou = '1.0'
+                GROUP BY id
+        )
+
+        SELECT no.nome, COUNT(*) AS nomeacoes, v.vit, no.nomeado_id as id, ROUND(v.vit*1.0/COUNT(*) * 100) as taxa_vitoria
+        FROM concorre c
+        JOIN nomeado no ON no.nomeado_id = c.nomeado_id
+        JOIN nomeacao m on m.nomeacao_id=c.nomeacao_id
+        JOIN vitorias as v on v.id = no.nomeado_id
+        GROUP BY no.nomeado_id
+        ORDER BY vit DESC, nomeacoes DESC
+        Limit 20;
+        """
+    ).fetchall()
+    return render_template('taxa-de-vitoria.html', nomeados=nomeados)
+
+@APP.route('/nomes-mais-comuns/')
+def nomes_mais_comuns():
+    nomes = db.execute(
+        """
+        WITH empresas AS (
+            SELECT DISTINCT 
+                TRIM(SUBSTR(n.nome, 1,
+                            CASE WHEN INSTR(n.nome,' ') = 0 THEN LENGTH(n.nome)
+                                    ELSE INSTR(n.nome,' ') - 1 END)) AS nome
+            FROM nomeado n 
+            WHERE n.nomeado_id LIKE 'co%'
+        ), 
+        semdoutores as (
+        SELECT lower(TRIM(REPLACE(REPLACE(n.nome,'Dr. ', ''), 'DR. ', ''))) as nome
+            FROM nomeado n
+        )
+
+        SELECT DISTINCT 
+            lower(TRIM(SUBSTR(n.nome, 1,
+                        CASE WHEN INSTR(n.nome,' ') = 0 THEN LENGTH(n.nome)
+                                ELSE INSTR(n.nome,' ') - 1 END))) AS pnome,
+            COUNT(*) AS vezes
+        FROM semdoutores n
+        WHERE lower(TRIM(SUBSTR(n.nome, 1,
+                        CASE WHEN INSTR(n.nome,' ') = 0 THEN LENGTH(n.nome)
+                                ELSE INSTR(n.nome,' ') - 1 END)))
+            NOT IN (SELECT nome FROM empresas)
+        GROUP BY pnome
+        ORDER BY vezes DESC
+        LIMIT 20;
+        """
+    ).fetchall()
+    return render_template('nomes-mais-comuns.html', nomes=nomes)
+
+@APP.route('/filmes-mais-esnobados/')
+def filmes_mais_esnobados():
+    filmes = db.execute(
+        """
+        WITH t1 AS (
+            SELECT f.filme_id as filme_id, COUNT(n.filme_id) as vitorias
+            FROM filme AS f 
+            JOIN nomeacao AS n ON n.filme_id = f.filme_id
+            WHERE n.ganhou = '1.0'
+            GROUP BY f.filme_id
+        )
+        
+        SELECT f.filme_id, f.nome, COALESCE(t1.vitorias,0) as vitorias, COUNT(n.filme_id) AS nomeacoes,
+        (COUNT(n.filme_id) -  COALESCE(t1.vitorias,0)) as esnobada
+        FROM filme AS f 
+        JOIN nomeacao AS n ON n.filme_id = f.filme_id
+        Left JOIN t1 ON t1.filme_id = f.filme_id
+        GROUP BY f.filme_id, f.nome
+        ORDER BY esnobada desc, nomeacoes desc
+        Limit 50;
+        """
+    ).fetchall()
+    return render_template('filmes-mais-esnobados.html', filmes=filmes)
+
+@APP.route("/mais-vitorias-variadas/")
+def mais_vitorias_variadas():
+    entidades = db.execute(
+        """
+        WITH t1 AS (
+            SELECT DISTINCT no.nomeado_id AS nomeado_id, cat.categoria_id AS categoria_id
+            FROM nomeado AS no
+            LEFT JOIN concorre AS c ON c.nomeado_id = no.nomeado_id
+            JOIN nomeacao AS n ON n.nomeacao_id = c.nomeacao_id
+            JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
+            JOIN categoria AS cat ON cat.categoria_id = ca.categoria_id
+            WHERE n.ganhou = '1.0'
+            ORDER BY no.nome
+        )
+
+        SELECT no.nome, no.nomeado_id AS id, COUNT(no.nomeado_id) AS vitorias_distintas
+        FROM nomeado AS no
+        JOIN t1 ON no.nomeado_id = t1.nomeado_id
+        GROUP BY no.nome
+        ORDER BY vitorias_distintas DESC, no.nome ASC 
+        LIMIT 20
+        """
+    ).fetchall()
+    return render_template('mais-vitorias-variadas.html', entidades=entidades)
+
+@APP.route('/maior-menor/')
+def maior_menor():
+    nomes = db.execute(
+        """ 
+        WITH longo AS (
+            SELECT  f.nome AS filme_longo,
+                f.filme_id as filme_longo_id,
+                LENGTH(f.nome) AS tamanho_longo,
+                ROW_NUMBER() OVER (ORDER BY LENGTH(f.nome) DESC) AS rn
+            FROM filme f
+            LIMIT 10
+        ),
+        curto AS (
+            SELECT f.nome AS filme_curto,
+            f.filme_id as filme_curto_id,
+                LENGTH(f.nome) AS tamanho_curto,
+                ROW_NUMBER() OVER (ORDER BY LENGTH(f.nome) ASC) AS rn
+            FROM filme f
+            LIMIT 10
+        )
+        SELECT l.filme_longo, l.filme_longo_id,c.filme_curto_id , l.tamanho_longo, c.filme_curto, c.tamanho_curto
+        FROM longo l
+        JOIN curto c ON l.rn = c.rn
+        ORDER BY l.rn;
+        """
+    ).fetchall()
+    return render_template('maior-menor.html', nomes=nomes)
+
+@APP.route('/smiths/')
+def smiths():
+    smiths = db.execute(
+        """
+        SELECT n.nome, ce.cerimonia_id
+        FROM nomeado n
+        JOIN concorre c ON n.nomeado_id = c.nomeado_id
+        JOIN nomeacao na ON c.nomeacao_id = na.nomeacao_id
+        JOIN categoria_ano ca ON na.categoria_ano_id = ca.categoria_ano_id
+        JOIN cerimonia ce ON ca.cerimonia_id = ce.cerimonia_id
+        WHERE n.nome LIKE '%Smith%' and ce.cerimonia_id BETWEEN 20 and 35;
+        """
+    ).fetchall()
+    suffix = [getSuffix(row['cerimonia_id']) for row in smiths]
+    return render_template('smiths.html', smiths=smiths, suffix=suffix)
 
 # ======================================
 # FUNÇÕES AUXILIARES

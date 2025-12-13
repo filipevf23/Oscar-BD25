@@ -20,22 +20,23 @@
             Resultado
         </th>
     </tr>
-    {% for f in filme %}
+    {% for i in range(filme|length) %}
     <tr>
         <td>
-            <a href="{{ url_for('categoria_ano', id=f.categoria_ano_id) }}">{{ f.categoria }}</a>
+            <a href="{{ url_for('categoria_ano', id=filme[0].categoria_ano_id) }}">{{ filme[0].categoria }}</a>
         </td>
         <td>
-            {% if f.nomeado_id %}
-                <a href="{{ url_for('nomeado', id=f.nomeado_id) }}">
-                    {{ f.nomeado }}
-                </a>
+            {% if nomeados[i]['nomeados_id'][0] %}
+                {% for j in range(nomeados[i]|length) %}
+                    {%- if j > 0 -%}, {% endif %}
+                    <a href="{{ url_for('nomeado', id=nomeados[i]['nomeados_id'][j]) }}">{{ nomeados[i]['nomes'][j] }}</a>
+                {% endfor %}
             {% else %}
-                <a href="{{ url_for('pais', id=f.nomeacao) }}"> {{f.nomeacao}}
+                <a href="{{ url_for('pais', id=filme[0].nomeacao) }}"> {{filme[0].nomeacao}}
           {% endif %}
         </td>
         <td>
-            {% if f.ganhou == '1.0' %}
+            {% if filme[i].ganhou == '1.0' %}
             Ganhou
             {% else %}
             Perdeu
