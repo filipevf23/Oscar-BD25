@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>EMPRESAS MAIS NOMEADAS</h1>
+<table>
+    <tr>
+        <th>Empresa</th>
+        <th>Nomeações</th>
+        <th>Vitórias</th>
+    </tr>
+    {% for e in empresas %}
+    <tr>
+        <td><a href="{{url_for('nomeado', id=e.id)}}">{{ e.nome }}</a></td>
+        <td>{{ e.nomeacoes }}</td>
+        <td>{{ e.vit }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

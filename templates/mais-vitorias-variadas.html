@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>MAIOR NÚMERO DE VITÓRIAS EM CATEGORIAS CANÔNICAS DISTINTAS</h1>
+<table>
+    <tr>
+        <th>Entidade</th>
+        <th>Vitórias Distintas</th>
+    </tr>
+    {% for e in entidades %}
+    <tr>
+        <td><a href="{{url_for('nomeado', id=e.id)}}">{{ e.nome }}</a></td>
+        <td>{{ e.vitorias_distintas }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
