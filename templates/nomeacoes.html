@@ -23,27 +23,34 @@
         </th>
     </tr>
 
-    {% for n in nomeacoes %}
+    {% for i in range(nomeacoes|length) %}
 
     <tr>
         <td>
-            <a href="{{ url_for('nomeacao', id=n.nomeacao_id) }}">{{ n.nomeacao_id }}</a>
+            <a href="{{ url_for('nomeacao', id=nomeacoes[i].nomeacao_id) }}">{{ nomeacoes[i].nomeacao_id }}</a>
         </td>
         <td>
-            <a href="{{ url_for('categoria_ano', id=n.categoria_ano_id) }}">{{ n.categoria }}</a>
+            <a href="{{ url_for('categoria_ano', id=nomeacoes[i].categoria_ano_id) }}">{{ nomeacoes[i].categoria }}</a>
         </td>
         <td>
-        {% if n.nome != 'nan' %}
-            <a href="{{url_for('nomeado', id=n.nomeado_id)}}">{{ n.nome }}</a>
+        {% if nomeacoes[i].nome != 'nan' %}
+            {% for j in range(nomeados[i]|length) %}
+                {% if nomeados[i][j] != '?' %}
+                    <a href="{{url_for('nomeado', id=nomeados_id[i][j])}}">{{ nomeados[i][j] }}</a>
+                {% else %}
+                {{ nomeados[i][j] }}
+                {% endif %}
+            <br>
+            {% endfor %}
         {% else %}
             -
         {% endif %}
         </td>
         <td>
-            <a href="{{ url_for('filme', id=n.filme_id) }}">{{ n.filme_nome }}</a>
+            <a href="{{ url_for('filme', id=nomeacoes[i].filme_id) }}">{{ nomeacoes[i].filme_nome }}</a>
         </td>
         <td>
-            {% if n.ganhou != 'nan' %}
+            {% if nomeacoes[i].ganhou != 'nan' %}
             Ganhou
             {% else %}
             Perdeu

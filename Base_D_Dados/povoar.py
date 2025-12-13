@@ -18,6 +18,7 @@ cur.execute('Delete from categoria')
 cur.execute('Delete from categoria_ano')
 cur.execute('Delete from nomeacao')
 cur.execute('Delete from concorre')
+cur.execute('Delete from nomeado')
 #Reinicia os valores criados pelo SQL
 cur.execute("DELETE FROM sqlite_sequence;")
 
