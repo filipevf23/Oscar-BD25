@@ -37,10 +37,11 @@ def cerimonias():
 def cerimonia(id):
     aux = db.execute(
         """
-        SELECT ca.categoria_ano_id, no.nomeado_id, no.nome
+        SELECT DISTINCT ca.categoria_ano_id, no.nomeado_id, no.nome, f.filme_id, f.nome as filme_nome
         FROM nomeacao n
         JOIN concorre c on c.nomeacao_id = n.nomeacao_id
         JOIN nomeado no on no.nomeado_id = c.nomeado_id
+        JOIN filme f on f.filme_id = n.filme_id
         JOIN categoria_ano ca ON ca.categoria_ano_id = n.categoria_ano_id
         WHERE ca.cerimonia_id = ?
         AND n.ganhou = '1.0'
@@ -48,11 +49,10 @@ def cerimonia(id):
     , (id,)).fetchall()
     cerimonia = db.execute(
         """
-        SELECT DISTINCT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, n.nome, f.nome AS filme_nome, ca.categoria_ano_id
+        SELECT DISTINCT cer.cerimonia_id, cer.ano, ca.categoria, n.nome, ca.categoria_ano_id
         FROM cerimonia AS cer
         JOIN categoria_ano AS ca ON ca.cerimonia_id = cer.cerimonia_id
         JOIN nomeacao AS n ON n.categoria_ano_id = ca.categoria_ano_id
-        LEFT JOIN filme AS f ON f.filme_id = n.filme_id
         WHERE n.ganhou = '1.0'
         AND cer.cerimonia_id = ?
         ORDER BY ca.categoria
@@ -64,11 +64,16 @@ def cerimonia(id):
     for row in cerimonia:
         aux1 = []
         aux2 = []
+        aux3 = []
+        aux4 = []
         for r in aux:
             if r['categoria_ano_id'] == row['categoria_ano_id']:
-                aux1.append(r['nomeado_id'])
-                aux2.append(r['nome'])
-        nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
+                if r['nomeado_id'] not in aux1 and r['nome'] not in aux2:
+                    aux1.append(r['nomeado_id'])
+                    aux2.append(r['nome'])
+                aux3.append(r['filme_id'])
+                aux4.append(r['filme_nome'])
+        nomeados.append({'nomeados_id':aux1, 'nomes':aux2, 'filmes_id':aux3, 'filme_nomes':aux4})
     for i in nomeados:
         print(i)
     suffix = getSuffix(id)
@@ -189,24 +194,40 @@ def filmes():
 
 @APP.route('/filmes/<id>/')
 def filme(id):
+    aux = db.execute(
+        """
+        SELECT f.filme_id, no.nomeado_id, no.nome
+        FROM nomeacao n
+        JOIN concorre c on c.nomeacao_id = n.nomeacao_id
+        JOIN nomeado no on no.nomeado_id = c.nomeado_id
+        JOIN filme as f on f.filme_id = n.filme_id
+        WHERE f.filme_id = ?
+        """
+    , (id,)).fetchall()
     filme = db.execute(""" 
-        select f.nome as nome,c.cerimonia_id as cerimonia_id, c.ano as ano,ano.categoria as categoria,
-                       p.nome as nomeado,n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id,
-                       p.nomeado_id as nomeado_id,n.nome as nomeacao
+        select f.nome as filme_nome, f.filme_id, c.cerimonia_id as cerimonia_id, c.ano as ano,ano.categoria as categoria,
+                       n.ganhou as ganhou,ano.categoria_ano_id as categoria_ano_id, n.nome
         from filme f
         join nomeacao n on n.filme_id=f.filme_id
         join categoria_ano ano on ano.categoria_ano_id=n.categoria_ano_id
         join cerimonia c on c.cerimonia_id=ano.cerimonia_id
-        left join concorre con on con.nomeacao_id=n.nomeacao_id
-        left join nomeado p on p.nomeado_id=con.nomeado_id
         where f.filme_id = ?
         Order by n.ganhou;
         """,(id,)).fetchall()
-    fnome = filme[0]['nome']
+    fnome = filme[0]['filme_nome']
     cerimonia = filme[0]['cerimonia_id']
+    nomeados = []
+    for row in filme:
+        aux1 = []
+        aux2 = []
+        for r in aux:
+            if r['filme_id'] == row['filme_id']:
+                aux1.append(r['nomeado_id'])
+                aux2.append(r['nome'])
+        nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
     ano = filme[0]['ano']
     suffix = getSuffix(cerimonia)
-    return render_template('filme.html',filme=filme,fnome=fnome,ano=ano,cerimonia=cerimonia, suffix=suffix)
+    return render_template('filme.html',filme=filme,fnome=fnome, nomeados=nomeados, ano=ano,cerimonia=cerimonia, suffix=suffix)
 
 
 @APP.route('/nomeados/')

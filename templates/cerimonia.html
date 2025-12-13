@@ -38,8 +38,11 @@
             {% endfor %}
         </td>
         <td>
-            {% if cerimonia[i].filme_id %}
-            <a href="{{ url_for('filme', id=cerimonia[i].filme_id) }}">{{ cerimonia[i].filme_nome }}</a>
+            {% if nomeados[i]['filmes_id'][0] %}
+            {% for j in range(nomeados[i]['filmes_id']|length) %}
+            <a href="{{ url_for('filme', id=nomeados[i]['filmes_id'][j]) }}">{{ nomeados[i]['filme_nomes'][j] }}</a>
+            <br>
+            {% endfor %}
             {% else %}
                 -  
             {% endif %}
