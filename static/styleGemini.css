@@ -1,0 +1,182 @@
+/*
+======================================================
+  ESTILOS GLOBAIS
+======================================================
+*/
+:root {
+    /* Cores Inspiradas no Oscar: */
+    --gold: #FFD700;        /* Ouro Puro */
+    --deep-gold: #C0A000;   /* Ouro Mais Escuro/Dourado */
+    --black: #1A1A1A;       /* Preto Profundo (para contraste) */
+    --white: #F8F8F8;       /* Branco Quase Puro (para texto) */
+    --red-carpet: #8B0000;  /* Vermelho Tapete */
+    --background-dark: #0A0A0A; /* Fundo Muito Escuro */
+}
+
+body {
+    font-family: 'Georgia', serif;
+    background-color: var(--background-dark);
+    color: var(--white);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+/*
+======================================================
+  LINKS (A) - EXCETO BOTÕES
+======================================================
+*/
+a:not(.button) {
+    color: var(--gold); /* Cor primária: Ouro */
+    text-decoration: none; /* Remove o sublinhado padrão */
+    font-weight: bold;
+    border-bottom: 1px dashed var(--deep-gold); /* Sublinhado discreto e pontilhado */
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+}
+
+a:not(.button):hover {
+    color: var(--white); /* Brilho: Texto fica branco ao passar o mouse */
+    border-bottom: 1px solid var(--gold); /* Sublinhado fica sólido e dourado */
+    background-color: rgba(255, 215, 0, 0.1); /* Um leve fundo dourado */
+    padding-bottom: 1px;
+}
+
+a:not(.button):active {
+    color: var(--deep-gold);
+}
+
+
+/*
+======================================================
+  TIPOGRAFIA - HEADERS
+======================================================
+*/
+h1, h2, h3 {
+    font-family: 'Arial Black', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5em;
+    border-bottom: 2px solid var(--deep-gold);
+    padding-bottom: 10px;
+}
+
+h1 {
+    color: var(--gold);
+    text-align: center;
+    font-size: 2.5em;
+    margin-top: 0;
+    padding-top: 20px;
+}
+
+h2 {
+    color: var(--white);
+    font-size: 1.8em;
+}
+
+h3 {
+    color: var(--deep-gold);
+    font-size: 1.4em;
+}
+
+/* Parágrafos Simples */
+p {
+    color: var(--white);
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+/*
+======================================================
+  BOTÕES - O TOQUE GLAMUROSO
+======================================================
+*/
+.button {
+    display: inline-block;
+    padding: 12px 25px;
+    margin: 10px 5px;
+    font-size: 1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.button:hover {
+    background-color: var(--deep-gold);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Se você quiser um botão de destaque extra, talvez para a busca ou home */
+.button.primary {
+    background-color: var(--red-carpet);
+    color: var(--white);
+    border: 2px solid var(--gold);
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.6);
+}
+
+.button.primary:hover {
+    background-color: #A52A2A;
+    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.8);
+}
+
+/*
+======================================================
+  TABELAS - ORGANIZAÇÃO CHIQUE
+======================================================
+*/
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background-color: var(--black);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--deep-gold);
+}
+
+th {
+    background-color: var(--deep-gold);
+    color: var(--black);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(255, 215, 0, 0.05);
+}
+
+tr:hover {
+    background-color: rgba(255, 215, 0, 0.15);
+    cursor: pointer;
+}
+
+/* Para o footer ou informações menores */
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 1px solid var(--deep-gold);
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.6);
+}

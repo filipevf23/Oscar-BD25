@@ -158,7 +158,7 @@ def categoria_ano(id):
                 aux1.append(r['nomeado_id'])
                 aux2.append(r['nome'])
         nomeados.append({'nomeados_id':aux1, 'nomes':aux2})
-    suffix = getSuffix(id)
+    suffix = getSuffix(nomeacoes[0]['cerimonia_id'])
     return render_template('categoria_ano.html', ganhador=ganhador, nomeados=nomeados, nomeacoes=nomeacoes, suffix=suffix)
 
 @APP.route('/filmes/')
