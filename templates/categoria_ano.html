@@ -2,26 +2,30 @@
 
 {% block content %}
 
-<h1>Categoria: {{ ganhador.categoria }}</h1>
-<h3>Categoria Canônica: <a href="{{url_for('categoria', id=ganhador.categoria_id)}}">{{ ganhador.categoria_canonica }}</a></h3>
+<h1>Categoria: {{ ganhador[0].categoria }}</h1>
+<h3>Categoria Canônica: <a href="{{url_for('categoria', id=ganhador[0].categoria_id)}}">{{ ganhador[0].categoria_canonica }}</a></h3>
 <p>
-    <a href="{{ url_for('cerimonia', id=ganhador.cerimonia_id) }}">{{ ganhador.cerimonia_id }}{{suffix}} OSCARS | {{ ganhador.ano }}</a>
+    <a href="{{ url_for('cerimonia', id=ganhador[0].cerimonia_id) }}">{{ ganhador[0].cerimonia_id }}{{suffix}} OSCARS | {{ ganhador[0].ano }}</a>
 </p>
 
 
 <h2>
-    Ganhador: 
-        {% if nomeados[0]['nomeados_id'][0] %}
-            {% for i in range(nomeados[0]['nomeados_id']|length) %}
-                {% if i > 0 %}, {% endif %}
-                <a href="{{url_for('nomeado', id=nomeados[0]['nomeados_id'][i])}}">{{ nomeados[0]['nomes'][i] }}</a>
-            {% endfor %}
-        {% else %}
-            <a href="{{url_for('pais', id=ganhador.nome)}}">{{ ganhador.nome }}</a>      
-        {% endif %}
-            {% if ganhador.filme_id %}
-                (<a href="{{url_for('filme', id=ganhador.filme_id)}}">{{ ganhador.filme_nome }}</a>)
-            {% endif %}
+    Ganhador{% if ganhador|length > 1 %}es{% endif %}: 
+    {% for i in range(nomeacoes|length) %}
+    <tr>
+        <td>
+            <a href="{{url_for('nomeacao', id=ganhador[i].nomeacao_id)}}">
+                    {% for j in range(nomeados[i]['nomes']|length) %}
+                        {% if j > 0 %}, {% endif %}
+                        {{ nomeados[i]['nomes'][j] }}
+                    {% endfor %}
+                    {% if ganhador[i].filme_id %}
+                        ({{ ganhador[i].filme_nome }})
+                    {% endif %}
+            </a> 
+        </td>
+    </tr>
+    {% endfor %}
 </h2>
 
 <table>

@@ -48,12 +48,11 @@ def cerimonia(id):
     , (id,)).fetchall()
     cerimonia = db.execute(
         """
-        SELECT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, n.nome, f.nome AS filme_nome, ca.categoria_ano_id
+        SELECT DISTINCT cer.cerimonia_id, cer.ano, ca.categoria, f.filme_id, n.nome, f.nome AS filme_nome, ca.categoria_ano_id
         FROM cerimonia AS cer
         JOIN categoria_ano AS ca ON ca.cerimonia_id = cer.cerimonia_id
         JOIN nomeacao AS n ON n.categoria_ano_id = ca.categoria_ano_id
         LEFT JOIN filme AS f ON f.filme_id = n.filme_id
-        LEFT JOIN concorre AS conc ON conc.nomeacao_id = n.nomeacao_id
         WHERE n.ganhou = '1.0'
         AND cer.cerimonia_id = ?
         ORDER BY ca.categoria
@@ -148,7 +147,21 @@ def categoria_ano(id):
         """
         , (id,)
     ).fetchall()
-    ganhador = nomeacoes[0]
+    ganhador = db.execute(
+        """
+        SELECT cat.categoria_canonica, ca.categoria, n.nomeacao_id, f.filme_id, f.nome AS filme_nome, 
+                n.nome, ca.categoria_ano_id, cer.ano, cer.cerimonia_id, cat.categoria_id
+        FROM cerimonia as cer
+        JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
+        JOIN categoria as cat on cat.categoria_id = ca.categoria_id
+        JOIN nomeacao as n on n.categoria_ano_id = ca.categoria_ano_id
+        LEFT JOIN filme as f on f.filme_id = n.filme_id
+        WHERE ca.categoria_ano_id = ?
+        AND ganhou = '1.0'
+        ORDER BY n.ganhou
+        """
+        , (id,)
+    ).fetchall()
     nomeados = []
     for row in nomeacoes:
         aux1 = []
