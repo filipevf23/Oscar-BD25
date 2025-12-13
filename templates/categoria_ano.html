@@ -19,8 +19,12 @@
                         {% if j > 0 %}, {% endif %}
                         {{ nomeados[i]['nomes'][j] }}
                     {% endfor %}
-                    {% if ganhador[i].filme_id %}
+                    {% if ganhador[i].filme_id and nomeados[i]['nomeados_id'][0] %}
                         ({{ ganhador[i].filme_nome }})
+                    {% else %}
+                        {% if ganhador[i].filme_id %}
+                            {{ ganhador[i].filme_nome }}
+                        {% endif %}
                     {% endif %}
             </a> 
         </td>
@@ -40,8 +44,12 @@
                         {% if j > 0 %}, {% endif %}
                         {{ nomeados[i]['nomes'][j] }}
                     {% endfor %}
-                    {% if nomeacoes[i].filme_id %}
+                    {% if nomeacoes[i].filme_id and nomeados[i]['nomeados_id'][0] %}
                         ({{ nomeacoes[i].filme_nome }})
+                    {% else %}
+                        {% if nomeacoes[i].filme_id %}
+                            {{ nomeacoes[i].filme_nome }}
+                        {% endif %}
                     {% endif %}
             </a> 
         </td>
