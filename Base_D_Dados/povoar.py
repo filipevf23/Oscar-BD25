@@ -84,9 +84,22 @@ for j, row in df.iterrows():
 
     for idx, (nome, rid) in enumerate(zip(nomes, ids)):
         
-        # gera ID se for '?'
+        # gerar ID se for '?'
         if rid == '?':
-            rid = f"nn{row['Ceremony']}{j}{idx}"
+            #Conferir se já existe
+            cur.execute("""
+                SELECT nomeado_id
+                FROM nomeado
+                WHERE nome = ?
+                LIMIT 1
+            """, (nome,))
+            
+            res = cur.fetchone()
+
+            if res:
+                rid = res[0]  
+            else:
+                rid = f"nn{row['Ceremony']}{j}{idx}"
 
         # insere individualmente
         cur.execute("""
@@ -182,7 +195,19 @@ for j, row in df.iterrows():
 
         # se o ID for ?, gerar o mesmo ID que foi criado em nomeado
         if rid == '?':
-            rid = f"nn{row['Ceremony']}{j}{idx}"
+            cur.execute("""
+                SELECT nomeado_id
+                FROM nomeado
+                WHERE nome = ?
+                LIMIT 1
+            """, (nome,))
+                
+            res = cur.fetchone()
+
+            if res:
+                rid = res[0]  
+            else:
+                rid = f"nn{row['Ceremony']}{j}{idx}"
 
         cur.execute("""
             INSERT OR IGNORE INTO concorre (nomeado_id, nomeacao_id)
