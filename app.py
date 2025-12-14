@@ -71,8 +71,9 @@ def cerimonia(id):
                 if r['nomeado_id'] not in aux1 and r['nome'] not in aux2:
                     aux1.append(r['nomeado_id'])
                     aux2.append(r['nome'])
-                aux3.append(r['filme_id'])
-                aux4.append(r['filme_nome'])
+                if r['filme_id'] not in aux3 and r['filme_nome'] not in aux4:
+                    aux3.append(r['filme_id'])
+                    aux4.append(r['filme_nome'])
         nomeados.append({'nomeados_id':aux1, 'nomes':aux2, 'filmes_id':aux3, 'filme_nomes':aux4})
     for i in nomeados:
         print(i)
@@ -83,17 +84,17 @@ def cerimonia(id):
 def categorias():
     aux = db.execute(
         """
-        SELECT cat.categoria_canonica,  cat.classe, GROUP_CONCAT(DISTINCT ca.categoria), MIN(cer.ano) AS ano, ca.cerimonia_id, cat.categoria_id
+        SELECT cat.categoria_canonica,  cat.classe, GROUP_CONCAT(DISTINCT ca.categoria), MIN(cer.cerimonia_id) AS cerimonia, cer.ano, cat.categoria_id
         FROM cerimonia as cer
         JOIN categoria_ano as ca on ca.cerimonia_id = cer.cerimonia_id
         JOIN categoria as cat on cat.categoria_id = ca.categoria_id
         GROUP BY cat.categoria_canonica, cat.classe
-        ORDER BY ano 
+        ORDER BY cerimonia
         """
     ).fetchall()
     categorias = []
     for row in aux:
-        categorias.append({'canonica':row[0], 'classe':row[1], 'nomes':row[2].split(","), 'ano':row[3], 'cerimonia_id':row[4], 'categoria_id':row[5]})
+        categorias.append({'canonica':row[0], 'classe':row[1], 'nomes':row[2].split(","), 'cerimonia':row[3], 'ano':row[4], 'categoria_id':row[5]})
     return render_template('categorias.html', categorias=categorias)
 
 @APP.route('/categorias/<int:id>')
@@ -289,7 +290,7 @@ def nomeacao(id):
         FROM nomeacao AS n
         LEFT JOIN concorre AS c ON c.nomeacao_id = n.nomeacao_id
         LEFT JOIN nomeado AS no ON no.nomeado_id = c.nomeado_id
-        JOIN filme AS f ON f.filme_id = n.filme_id
+        LEFT JOIN filme AS f ON f.filme_id = n.filme_id
         JOIN categoria_ano AS ca ON ca.categoria_ano_id = n.categoria_ano_id
         WHERE n.nomeacao_id = ?
         """

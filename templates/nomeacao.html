@@ -17,6 +17,7 @@
     </tr>
     {% endif %}
 
+    {% if temNome %}
     <tr>
         <th>Nomeado{% if nomeacao[0]|length > 1 %}s{% endif %}</th>
         <td>
@@ -30,6 +31,7 @@
             {% endif %}
         </td>
     </tr>
+    {% endif %}
 
     {% if temProjeto %}
     <tr>
